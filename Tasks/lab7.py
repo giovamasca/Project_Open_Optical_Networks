@@ -1,10 +1,11 @@
 import numpy as np
 # import pandas as pd
-import random
+# import random
 import matplotlib.pyplot as plt
 
 from Project_Open_Optical_Networks.Core.elements import Network, Connection
 from Project_Open_Optical_Networks.Core.parameters import *
+from Project_Open_Optical_Networks.Core.utils import *
 
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance
@@ -27,35 +28,14 @@ for node in network_not_full.nodes:
 ########################################################################################################################
 ######## Evaluation of 100 random connections
 # network_full.restore_free_state_lines() ## restore network as at the beginning
-def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
-    nodes_gener = list(network.nodes.keys())  # extracts all nodes
-
-    avarage_bit_rate = 0
-    connections_generated = []  # defined a list of connections
-    for i in range(0, Numb_sim): # do a number of simulations equal to Numb_sim
-        n1 = random.randint(0, len(nodes_gener) - 1)  # any position is ok
-        n2 = random.randint(0, len(nodes_gener) - 1)
-        while n2 == n1:
-            n2 = random.randint(0, len(nodes_gener) - 1)  # repeat the random evaluation until there is a couple of nodes, not same values
-
-        connection_generated = Connection(nodes_gener[n1], nodes_gener[n2], 1)  # creates connection
-        connection_generated = network.stream(connection_generated, 'snr', use_state=True)  # stream it with state on and snr set
-        # if connection_generated.latency==np.NaN:
-        #     continue # avoid this connection
-        # with np.NaN the histograms avoid the corresponding values
-        connections_generated.append(connection_generated) # appends connection
-        avarage_bit_rate += connection_generated.bit_rate
-        # print('Evaluation in progress: ', np.round_(i/Numb_sim*100), ' %', end='\r')
-    print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
-    return connections_generated
 
 connections = {'full': [], 'not_full': [], 'fixed_rate': [], 'flex_rate': [], 'shannon': []}
-connections['full'] = random_generation_for_network(network=network_full, Numb_sim=100, network_label='full')
-connections['not_full'] = random_generation_for_network(network=network_not_full, Numb_sim=100, network_label='not_full')
+connections['full'] = random_generation_for_network(network=network_full, Numb_sim=Number_simulations, network_label='full')
+connections['not_full'] = random_generation_for_network(network=network_not_full, Numb_sim=Number_simulations, network_label='not_full')
 
-connections['fixed_rate'] = random_generation_for_network(network=network_fixed_rate, Numb_sim=100, network_label='fixed_rate')
-connections['flex_rate'] = random_generation_for_network(network=network_flex_rate, Numb_sim=100, network_label='flex_rate')
-connections['shannon'] = random_generation_for_network(network=network_shannon, Numb_sim=100, network_label='shannon')
+connections['fixed_rate'] = random_generation_for_network(network=network_fixed_rate, Numb_sim=Number_simulations, network_label='fixed_rate')
+connections['flex_rate'] = random_generation_for_network(network=network_flex_rate, Numb_sim=Number_simulations, network_label='flex_rate')
+connections['shannon'] = random_generation_for_network(network=network_shannon, Numb_sim=Number_simulations, network_label='shannon')
 
 # plt.figure(1)
 # plt.hist( [ [ connection_full.input + connection_full.output for connection_full in connections['full']],

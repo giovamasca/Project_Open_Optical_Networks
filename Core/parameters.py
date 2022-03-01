@@ -4,6 +4,7 @@ noise_power_spectral_density = 1e-9
 BER_target = 1e-3
 Rs = 32 # GHz symbol rate
 Bn = 12.5 # Ghz noise bandwith
+Number_simulations = 100
 ########################################
 
 from pathlib import Path
