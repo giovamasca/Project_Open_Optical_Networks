@@ -4,11 +4,18 @@ from scipy.special import erfcinv # this is the function of interest for bit rat
 
 from Project_Open_Optical_Networks.Core.parameters import *
 
-def phase_velocity():
-    phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light speed and a ratio
-    return phase_velocity
+##################### Constant Values #######################
+phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light speed and a ratio
+# n = 1.5, so c/n ~ (2/3)*c
 
-def dB_to_linear_conversion(dB_quantity):
+def latency_evaluation(length):
+    latency = length / phase_velocity # obtained delay in a line
+    return latency
+def noise_generation(signal_information, length): # generates noise from length and power and a very low constant
+    noise_power = noise_power_spectral_density * signal_information.signal_power * length
+    return noise_power
+
+def dB_to_linear_conversion_power(dB_quantity):
     return np.power(10, dB_quantity/10)
 
 def bit_rate_evaluation(GSNR_lin, strategy):

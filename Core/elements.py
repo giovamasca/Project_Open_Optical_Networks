@@ -151,21 +151,21 @@ class Line: # class for line objects
     @latency.setter
     def latency(self, latency):
         self._latency = latency
-    def noise_generation(self, signal_information): # generates noise from length and power and a very low constant
-        self._noise_power = noise_power_spectral_density * signal_information.signal_power * self.length
-    @property
-    def noise_power(self):
-        return self._noise_power
-    def latency_generation(self):  # evaluates latency
-        # v = 2 / 3 * c # velocity of the line is defined by light speed and a ratio
-        # self._latency = self.length / v # time is length over speed
-
-        self.latency = self.length / phase_velocity()  # time is length over speed
+    # def noise_generation(self, signal_information): # generates noise from length and power and a very low constant
+    #     self._noise_power = noise_power_spectral_density * signal_information.signal_power * self.length
+    # @property
+    # def noise_power(self):
+    #     return self._noise_power
+    # def latency_generation(self):  # evaluates latency
+    #     # v = 2 / 3 * c # velocity of the line is defined by light speed and a ratio
+    #     # self._latency = self.length / v # time is length over speed
+    #
+    #     self.latency = self.length / phase_velocity()  # time is length over speed
     def probe(self, signal_information): # this function is called by node method
-        self.latency_generation() # generates latency for current line
-        self.noise_generation(signal_information) # generates noise, requires signal power
-        signal_information.increment_latency(self.latency) # update latency accumulated in signal
-        signal_information.increment_noise(self.noise_power) # update noise accumulated in signal
+        latency = latency_evaluation(self.length) # generates latency for current line
+        noise_power = noise_generation(signal_information=signal_information, length=self.length) # generates noise, requires signal power
+        signal_information.increment_latency(latency) # update latency accumulated in signal
+        signal_information.increment_noise(noise_power) # update noise accumulated in signal
 
         node = self.successive[signal_information.path[0]] # remember that before calling this class method tha path has removed first node,
         # so we are calling as successive the first node of the current path, that will be next node to analyze.
@@ -590,7 +590,7 @@ class Network: # this is the most important class and define the network from th
 
         # let's find the corresponding SNR for path label at input and obtain it as a floating number
         GSNR_dB = self.weighted_paths['snr'].loc[self.weighted_paths['path'] == path_label].item()
-        GSNR_lin = dB_to_linear_conversion(GSNR_dB) # in linear value
+        GSNR_lin = dB_to_linear_conversion_power(GSNR_dB) # in linear value
 
         return bit_rate_evaluation(GSNR_lin, strategy)
 
@@ -604,51 +604,39 @@ class Connection:  # class that define a connection between two nodes
         self._snr = float(0)  # snr set to 0
         self._channel = channel  # channel of interest if defined
         self._bit_rate = bit_rate  # the bit rate of the connection
-
     @property
     def input(self):
         return self._input
-
     @property
     def output(self):
         return self._output
-
     @property
     def signal_power(self):
         return self._signal_power
-
     @signal_power.setter
     def signal_power(self, signal_power):
         self._signal_power = signal_power
-
     @property
     def latency(self):
         return self._latency
-
     @latency.setter
     def latency(self, latency):
         self._latency = latency
-
     @property
     def snr(self):
         return self._snr
-
     @property
     def channel(self):
         return self._channel
-
     @property
     def bit_rate(self):
         return self._bit_rate
-
     @snr.setter
     def snr(self, snr):
         self._snr = snr
-
     @channel.setter
     def channel(self, channel):
         self._channel = channel
-
     @bit_rate.setter
     def bit_rate(self, bit_rate):
         self._bit_rate = bit_rate
