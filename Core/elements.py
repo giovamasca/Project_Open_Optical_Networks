@@ -151,6 +151,9 @@ class Line: # class for line objects
     @state.setter
     def state(self, state):
         self._state=state
+    def ase_generation(self):
+        ASE = self.n_amplifier * (h_Plank * frequency * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain)-1) )
+        return ASE
     def probe(self, signal_information): # this function is called by node method
         latency = latency_evaluation(self.length) # generates latency for current line
         noise_power = noise_generation(signal_power=signal_information.signal_power, length=self.length) # generates noise, requires signal power
