@@ -2,9 +2,10 @@
 number_channels = 10 # if number of channels changes
 noise_power_spectral_density = 1e-9
 BER_target = 1e-3
-Rs = 32 # GHz symbol rate
-Bn = 12.5 # Ghz noise bandwith
+Rs = 32e9 # GHz symbol rate
+Bn = 12.5e9 # Ghz noise bandwith
 span_length = 80e3 # m, equal 80 km
+frequency = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
 Number_simulations = 100
 ########################################
 ############## STATE ###################

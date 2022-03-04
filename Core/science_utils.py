@@ -1,4 +1,5 @@
 from scipy.constants import c as speed_light
+from scipy.constants import Planck as h_Plank
 import numpy as np
 from scipy.special import erfcinv # this is the function of interest for bit rate evaluation
 
@@ -31,14 +32,14 @@ def bit_rate_evaluation(GSNR_lin, strategy):
     third_formula = 10 * Rs / Bn * (np.power(erfcinv(8 / 3 * BER_target), 2))
     if strategy == 'fixed_rate':
         if GSNR_lin >= first_formula:
-            Rb = 100
+            Rb = 100e9 # Gbps
     elif strategy == 'flex_rate':
         if GSNR_lin >= first_formula and GSNR_lin < second_formula:
-            Rb = 100
+            Rb = 100e9
         elif GSNR_lin >= second_formula and GSNR_lin < third_formula:
-            Rb = 200
+            Rb = 200e9
         elif GSNR_lin >= third_formula:
-            Rb = 400
+            Rb = 400e9
     elif strategy == 'shannon':
         Rb = 2 * Rs * np.log2(1 + GSNR_lin * Rs / Bn)
     else:
