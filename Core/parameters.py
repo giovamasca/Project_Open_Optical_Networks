@@ -4,6 +4,7 @@ noise_power_spectral_density = 1e-9
 BER_target = 1e-3
 Rs = 32 # GHz symbol rate
 Bn = 12.5 # Ghz noise bandwith
+span_length = 80e3 # m, equal 80 km
 Number_simulations = 100
 ########################################
 ############## STATE ###################

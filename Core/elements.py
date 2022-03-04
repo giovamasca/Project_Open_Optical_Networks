@@ -121,6 +121,9 @@ class Line: # class for line objects
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
         self._state = np.ones(number_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
+        self._n_amplifier = n_amplifier_evaluation(length)
+        self.gain = 16 # dB
+        self.noise_figure = 3 # dB
     @property
     def label(self):
         return self._label
@@ -133,6 +136,9 @@ class Line: # class for line objects
     @property
     def state(self):
         return self._state
+    @property
+    def n_amplifier(self):
+        return self._n_amplifier
     @label.setter
     def label(self, label):
         self._label=label
@@ -145,22 +151,6 @@ class Line: # class for line objects
     @state.setter
     def state(self, state):
         self._state=state
-    @property
-    def latency(self):
-        return self._latency # no setter needed
-    @latency.setter
-    def latency(self, latency):
-        self._latency = latency
-    # def noise_generation(self, signal_information): # generates noise from length and power and a very low constant
-    #     self._noise_power = noise_power_spectral_density * signal_information.signal_power * self.length
-    # @property
-    # def noise_power(self):
-    #     return self._noise_power
-    # def latency_generation(self):  # evaluates latency
-    #     # v = 2 / 3 * c # velocity of the line is defined by light speed and a ratio
-    #     # self._latency = self.length / v # time is length over speed
-    #
-    #     self.latency = self.length / phase_velocity()  # time is length over speed
     def probe(self, signal_information): # this function is called by node method
         latency = latency_evaluation(self.length) # generates latency for current line
         noise_power = noise_generation(signal_power=signal_information.signal_power, length=self.length) # generates noise, requires signal power
