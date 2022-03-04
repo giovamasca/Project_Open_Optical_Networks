@@ -11,12 +11,14 @@ phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light 
 def latency_evaluation(length):
     latency = length / phase_velocity # obtained delay in a line
     return latency
-def noise_generation(signal_information, length): # generates noise from length and power and a very low constant
-    noise_power = noise_power_spectral_density * signal_information.signal_power * length
+def noise_generation(signal_power, length): # generates noise from length and power and a very low constant
+    noise_power = noise_power_spectral_density * signal_power * length
     return noise_power
 
 def dB_to_linear_conversion_power(dB_quantity):
     return np.power(10, dB_quantity/10)
+def linear_to_dB_conversion_power(linear_quantity):
+    return 10*np.log10(linear_quantity)
 
 def bit_rate_evaluation(GSNR_lin, strategy):
     Rb = 0

@@ -3,7 +3,7 @@ import json # to read and write json files
 import matplotlib.pyplot as plt # to plot
 import pandas as pd # for dataframes
 
-from Project_Open_Optical_Networks.Core.science_utils import *
+from Project_Open_Optical_Networks.Core.science_utils import * # and also import parameters as defined in science utils
 
 class SignalInformation: # this is the class of the signal
     def __init__(self, signal_power=1.0, path=None):
@@ -90,19 +90,19 @@ class Node: # class for node definition
         return self._transceiver
     @label.setter
     def label(self, label):
-        self._label=label
+        self._label = label
     @position.setter
     def position(self, position):
-        self._position=position
+        self._position = position
     @connected_nodes.setter
     def connected_nodes(self, connected_nodes):
-        self._connected_nodes=connected_nodes
+        self._connected_nodes = connected_nodes
     @successive.setter
     def successive(self, successive):
         self._successive=successive
     @switching_matrix.setter
     def switching_matrix(self, switching_matrix):
-        self._switching_matrix=switching_matrix
+        self._switching_matrix = switching_matrix
     def probe(self, signal_information): # define a propagation without modify state
         path = signal_information.path # extracts path
         if len(path)>1: # verify if there are still lines to go through path
@@ -163,7 +163,7 @@ class Line: # class for line objects
     #     self.latency = self.length / phase_velocity()  # time is length over speed
     def probe(self, signal_information): # this function is called by node method
         latency = latency_evaluation(self.length) # generates latency for current line
-        noise_power = noise_generation(signal_information=signal_information, length=self.length) # generates noise, requires signal power
+        noise_power = noise_generation(signal_power=signal_information.signal_power, length=self.length) # generates noise, requires signal power
         signal_information.increment_latency(latency) # update latency accumulated in signal
         signal_information.increment_noise(noise_power) # update noise accumulated in signal
 
@@ -342,16 +342,16 @@ class Network: # this is the most important class and define the network from th
             states_route_space = self.route_space.loc[index_route_space, 'availability_per_ch']
             state = states_route_space[signal.channel] #extract single state value of interest for if condition
 
-            if state==0: # occupied
+            if state==OCCUPIED: # occupied
                 signal.latency = None # the path is already occupied, change signal power into None value
-            elif state==1: # free
+            elif state==FREE: # free
                 start = True
                 previous_node=''
                 # then update line state
                 while len(path)>1:
                     line_label = path[:2]
                     line = self.lines[line_label]
-                    line.state[signal.channel]=0 # occupied
+                    line.state[signal.channel]=OCCUPIED # occupied
                     if start:
                         start=False
                     else: # changes the switching matrix of adjacent channels
@@ -359,12 +359,12 @@ class Network: # this is the most important class and define the network from th
                         next_node = path[1]
                         switch_matrix_address=self.nodes[actual_node].switching_matrix[previous_node][next_node]
                         if signal.channel == 0: # if channel is the first one
-                            switch_matrix_address[1] = 0
+                            switch_matrix_address[1] = OCCUPIED
                         elif signal.channel == number_channels - 1: # if channel is the first one
-                            switch_matrix_address[number_channels - 2] = 0
+                            switch_matrix_address[number_channels - 2] = OCCUPIED
                         else: # others position
-                            switch_matrix_address[signal.channel - 1] = 0
-                            switch_matrix_address[signal.channel + 1] = 0
+                            switch_matrix_address[signal.channel - 1] = OCCUPIED
+                            switch_matrix_address[signal.channel + 1] = OCCUPIED
                     previous_node = path[0]
                     path = path[1:]
             else:
@@ -411,7 +411,7 @@ class Network: # this is the most important class and define the network from th
         for input_connected_node in node.switching_matrix:
             for output_connected_node in node.switching_matrix[input_connected_node]:
                 if output_connected_node != input_connected_node:
-                    if np.sum(node.switching_matrix[input_connected_node][output_connected_node])==0:
+                    if np.sum(node.switching_matrix[input_connected_node][output_connected_node])==OCCUPIED:
                         if disp == None or disp == 'OFF':
                             print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is OFF')
                     else:
@@ -440,7 +440,7 @@ class Network: # this is the most important class and define the network from th
                     title += node + '->' # this title requires an arrow to define direction
                 titles.append(title[:-2]) # removes last arrow
 
-                signal = SignalInformation(1, path) # in point 5 of lab 3 is required 1 mW of signal power, by the way is not possible to view it
+                signal = SignalInformation(1, path) # in point 5 of lab 3 is required 1 mW of signal power, by the way is not possible to view noise power
                 # let's define signal power as 1 W, the noise will be proportional to it
                 # SNR doesn't change
 
@@ -452,7 +452,7 @@ class Network: # this is the most important class and define the network from th
 
                 # snr defined as dB, so 10 log10 of ratio between signal power and noise power
                 # if condition seems useless here, because there is no channel, is just a probe
-                snr = 10 * np.log10(signal.signal_power / signal.noise_power) # if signal.latency is not None else 0
+                snr = linear_to_dB_conversion_power(signal.signal_power / signal.noise_power) # if signal.latency is not None else 0
 
                 latencies.append(signal.latency)
                 snrs.append(snr)
@@ -466,11 +466,11 @@ class Network: # this is the most important class and define the network from th
 
         # once done it shouldn't be repeated if the network is the same
         return
-    def find_best(self, first_node, second_node):
+    def find_best(self, first_node, last_node):
         # ############## TEST ################à
-        # self.lines['AB'].state= [0]*10 # verifies the case of all occupied state
-        # self.lines['DB'].state= [0]*10
-        # self.lines['FB'].state= [0]*10
+        # self.lines['AB'].state= [OCCUPIED]*10 # verifies the case of all occupied state
+        # self.lines['DB'].state= [OCCUPIED]*10
+        # self.lines['FB'].state= [OCCUPIED]*10
         # ####################################
         # self.route_space_update()
 
@@ -483,24 +483,24 @@ class Network: # this is the most important class and define the network from th
         latencies = []
         number_channels_available = []
         for path_label in self.weighted_paths['path']: # extract each path obtained in weighted paths
-            if path_label[0] == first_node and path_label[-1] == second_node: # we are interested in only some specific paths with input and output defined
+            if path_label[0] == first_node and path_label[-1] == last_node: # we are interested in only some specific paths with input and output defined
                 path = path_label.replace('->','') # remove arrows
                 free = True # needed to remember out the while cycle that there is at least a free status or not
                 line = path[0:2] # extract line name
 
-                states_path = np.ones(number_channels, dtype='int') # this array updates states along path
+                states_path = np.ones(number_channels, dtype='int') # this array updates states along path, array of integers
                 while len(line)>1: # if there is enough nodes to define a path, at least two nodes
 
                     # extract the states from route space for this path
                     states = self.route_space['availability_per_ch'].loc[self.route_space['path']==path_label].item() # extracted as array
                     states_path = states_path * states # save states and update them while they are going line by line
-                    if np.sum(states)==0: # at least required one free state, so let's find where all accupancies are (all zeros, zero sum)
+                    if np.sum(states) == OCCUPIED: # at least required one free state, so let's find where all accupancies are (all zeros, zero sum)
                         free = False # let's remember that everything is occupied
                         break # useless go along the line, let's break out the while
                     path = path[1:] # update path for while (remove first node and go on)
                     line = path[0:2] # update line
                 if free==True: # only to do if at least there is one free state
-                    channels = np.array([i for i in range(0, number_channels) if states_path[i]==1]) # extracts positions [numbers that could be from 0 to max ch]
+                    channels = np.array([i for i in range(0, number_channels) if states_path[i]==FREE]) # extracts positions [numbers that could be from 0 to max ch]
                     if len(channels)>0: # if there are available channels it appends in list the results for dataframe
                         paths.append(path_label)
                         snrs.append(self.weighted_paths['snr'].loc[self.weighted_paths['path']==path_label].item()) # needed snr fot the corresponding path
@@ -540,7 +540,7 @@ class Network: # this is the most important class and define the network from th
         remove_connection = False # if some conditions are not satisfied let's avoid propagation
         Rb = 0 # initialized Rb
 
-        if set_lat_snr!='latency' and set_lat_snr!='snr': # THEY USE STATE
+        if set_lat_snr != 'latency' and set_lat_snr!='snr': # THEY USE STATE
             print('ERROR! Set for stream function in class Network avoided.') # if the setter is wrongly defined, it gives an error and exit
             exit(3)
 
@@ -558,7 +558,7 @@ class Network: # this is the most important class and define the network from th
             if Rb == 0: # if bit rate null let's avoid connection
                 remove_connection = True
         if remove_connection: # if at least one condition on bit rate and path is not respected, let's avoid it
-            connection.latency = np.NaN # set zeros for all components, except for channel that is None
+            connection.latency = np.NaN # set Not-A-Number for all components, except for channel that is None
             connection.snr = np.NaN
             connection.channel = None
             connection.bit_rate = np.NaN
@@ -574,8 +574,8 @@ class Network: # this is the most important class and define the network from th
 
         self.propagate(signal) # propagation of signal or lightpath
 
-        connection.latency = signal.latency # if signal.latency is not None else np.NaN # to view it of histogram st to 0 if NaN
-        connection.snr = 10 * np.log10( signal.signal_power / signal.noise_power ) # if signal.latency is not None else np.NaN # same as latency
+        connection.latency = signal.latency # if signal.latency is not None else np.NaN
+        connection.snr = linear_to_dB_conversion_power( signal.signal_power / signal.noise_power )
         connection.channel = channel # set channel
         connection.bit_rate = Rb # set bit rate
 
@@ -598,11 +598,10 @@ class Connection:  # class that define a connection between two nodes
     def __init__(self, input_node, output_node, signal_power=None, channel=None, bit_rate=None):
         self._input = input_node  # starting node
         self._output = output_node  # ending node
-        self._signal_power = signal_power if signal_power else float(
-            1)  # signal power definition, if not defined set to 1 W
+        self._signal_power = signal_power if signal_power else float(1)  # signal power definition, if not defined set to 1 W
         self._latency = float(0)  # latency set to 0
         self._snr = float(0)  # snr set to 0
-        self._channel = channel  # channel of interest if defined
+        self._channel = channel if channel else int(0) # channel of interest if defined
         self._bit_rate = bit_rate  # the bit rate of the connection
     @property
     def input(self):
