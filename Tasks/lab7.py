@@ -37,14 +37,17 @@ connections['fixed_rate'] = random_generation_for_network(network=network_fixed_
 connections['flex_rate'] = random_generation_for_network(network=network_flex_rate, Numb_sim=Number_simulations, network_label='flex_rate')
 connections['shannon'] = random_generation_for_network(network=network_shannon, Numb_sim=Number_simulations, network_label='shannon')
 
-# plt.figure(1)
-# plt.hist( [ [ connection_full.input + connection_full.output for connection_full in connections['full']],
-#             [connection_not_full.input + connection_not_full.output for connection_not_full in connections['not_full']] ] , bins=20,
-#           edgecolor='k', color=['g','b'], label=['Switching Matrix Full','Switching Matrix Not Full'] )
-# plt.title('Histogram of simulated nodes')
-# plt.legend()
-# plt.ylabel('number of results')
-# plt.xlabel('path')
+plt.figure(1)
+plt.hist( [ [ connection_full.input + connection_full.output for connection_full in connections['full']],
+            [connection_not_full.input + connection_not_full.output for connection_not_full in connections['not_full']] ] , bins=20,
+          edgecolor='k', color=['g','b'], label=['Switching Matrix Full','Switching Matrix Not Full'] )
+plt.title('Histogram of simulated nodes')
+plt.legend()
+plt.ylabel('number of results')
+plt.xlabel('path')
+figure = plt.gcf() # get current figure
+figure.set_size_inches(8, 6)
+plt.savefig('../Results/lab7_fig1')
 
 plt.figure(2)
 plt.hist( [ [connection_fixed_rate.input + connection_fixed_rate.output for connection_fixed_rate in connections['fixed_rate']],
@@ -55,15 +58,21 @@ plt.title('Histogram of simulated nodes')
 plt.legend()
 plt.ylabel('number of results')
 plt.xlabel('path')
+figure = plt.gcf() # get current figure
+figure.set_size_inches(8, 6)
+plt.savefig('../Results/lab7_fig2')
 
 plt.figure(3)
 plt.hist( [ [connection_full_hist.snr for connection_full_hist in connections['full']],
             [connection_not_full_hist.snr for connection_not_full_hist in connections['not_full']] ],
           edgecolor='k', color=['g','b'], label=['Switching Matrix Full ','Switching Matrix Not Full'], bins=20 )
 plt.title('Histogram of obtained SNRs for Switching Matrix networks')
-plt.legend()
+plt.legend(loc='upper left')
 plt.ylabel('number of results')
 plt.xlabel('SNR [dB]')
+figure = plt.gcf() # get current figure
+figure.set_size_inches(8, 6)
+plt.savefig('../Results/lab7_fig3')
 
 plt.figure(4)
 plt.hist( [ [connection_fixed_rate_hist.snr for connection_fixed_rate_hist in connections['fixed_rate']],
@@ -74,9 +83,12 @@ plt.title('Histogram of obtained SNRs for transceiver networks')
 plt.legend()
 plt.ylabel('number of results')
 plt.xlabel('SNR [dB]')
+figure = plt.gcf() # get current figure
+figure.set_size_inches(8, 6)
+plt.savefig('../Results/lab7_fig4')
 
 ##################################################################################################################
-# FIXED RATE
+# BIT RATE
 ##################################################################################################################
 capacity_fixed_rate = np.nansum([connections['fixed_rate'][i].bit_rate for i in range(0, len(connections['fixed_rate']))])
 avarage_fixed_rate = capacity_fixed_rate/len(connections['fixed_rate'])
@@ -90,14 +102,17 @@ capacity_shannon = np.nansum([connections['shannon'][i].bit_rate for i in range(
 avarage_shannon = capacity_shannon/len(connections['shannon'])
 shannon_label = 'Shannon with avarage Rb=' + str(avarage_shannon) + ' and C=' + str(capacity_shannon)
 
-plt.figure(5)
+fig = plt.figure(5)
+fig.subplots_adjust(bottom=0.25)
 plt.hist( [ [connection_fixed_rate.bit_rate for connection_fixed_rate in connections['fixed_rate']],
             [connection_flex_rate.bit_rate for connection_flex_rate in connections['flex_rate']],
             [connection_shannon.bit_rate for connection_shannon in connections['shannon']] ] , bins=10,
           edgecolor='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label] )
 plt.title('Histogram of Bit Rates')
-plt.legend()
-plt.ylabel('number of results')
+plt.legend(title='Histogram of Bit Rates',bbox_to_anchor=(0.5, -0.4), loc='lower center')
 plt.xlabel('Bit rate [Gbps]')
+figure = plt.gcf() # get current figure
+figure.set_size_inches(8, 6)
+plt.savefig('../Results/lab7_fig5_bit_rates.png')
 
 plt.show()
