@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 from Project_Open_Optical_Networks.Core.elements import Connection
 
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
@@ -22,3 +23,15 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         # print('Evaluation in progress: ', np.round_(i/Numb_sim*100), ' %', end='\r')
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
+
+def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title, ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None):
+    fig = plt.figure(figure_num)
+    fig.subplots_adjust(bottom=bottom)
+    plt.hist( list_data, bins=nbins, edgecolor=edge_color, color = color, label = label)
+    plt.title(title)
+    plt.legend(bbox_to_anchor = bbox_to_anchor, loc = loc)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(8, 6)
+    plt.savefig(savefig_path)

@@ -1,9 +1,9 @@
 import numpy as np
 # import pandas as pd
 # import random
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-from Project_Open_Optical_Networks.Core.elements import Network, Connection
+from Project_Open_Optical_Networks.Core.elements import Network #, Connection
 from Project_Open_Optical_Networks.Core.parameters import *
 from Project_Open_Optical_Networks.Core.utils import *
 
@@ -37,82 +37,56 @@ connections['fixed_rate'] = random_generation_for_network(network=network_fixed_
 connections['flex_rate'] = random_generation_for_network(network=network_flex_rate, Numb_sim=Number_simulations, network_label='flex_rate')
 connections['shannon'] = random_generation_for_network(network=network_shannon, Numb_sim=Number_simulations, network_label='shannon')
 
-plt.figure(1)
-plt.hist( [ [ connection_full.input + connection_full.output for connection_full in connections['full']],
-            [connection_not_full.input + connection_not_full.output for connection_not_full in connections['not_full']] ] , bins=20,
-          edgecolor='k', color=['g','b'], label=['Switching Matrix Full','Switching Matrix Not Full'] )
-plt.title('Histogram of simulated nodes')
-plt.legend()
-plt.ylabel('number of results')
-plt.xlabel('path')
-figure = plt.gcf() # get current figure
-figure.set_size_inches(8, 6)
-plt.savefig('../Results/lab7_fig1')
+################### FIGURE 1
+plot_histogram(figure_num=1, list_data=[ [ connection_full.input + connection_full.output for connection_full in connections['full']],
+               [connection_not_full.input + connection_not_full.output for connection_not_full in connections['not_full']] ],
+               nbins=np.arange(31)-0.5, edge_color='k', color=['g', 'b'], label=['Switching Matrix Full','Switching Matrix Not Full'],
+               title = 'Histogram of simulated nodes',
+               ylabel='number of results', xlabel='path', savefig_path='../Results/lab7_fig1')
 
-plt.figure(2)
-plt.hist( [ [connection_fixed_rate.input + connection_fixed_rate.output for connection_fixed_rate in connections['fixed_rate']],
+#################### FIGURE 2
+plot_histogram(figure_num = 2, list_data=[ [connection_fixed_rate.input + connection_fixed_rate.output for connection_fixed_rate in connections['fixed_rate']],
             [connection_flex_rate.input + connection_flex_rate.output for connection_flex_rate in connections['flex_rate']],
-            [connection_shannon.input + connection_shannon.output for connection_shannon in connections['shannon']] ] , bins=20,
-          edgecolor='k', color=['y', 'm', 'r'], label=['Fixed rate', 'Flex Rate', 'Shannon'] )
-plt.title('Histogram of simulated nodes')
-plt.legend()
-plt.ylabel('number of results')
-plt.xlabel('path')
-figure = plt.gcf() # get current figure
-figure.set_size_inches(8, 6)
-plt.savefig('../Results/lab7_fig2')
+            [connection_shannon.input + connection_shannon.output for connection_shannon in connections['shannon']] ],
+               nbins=np.arange(31)-0.5, edge_color='k', color=['y', 'm', 'r'], label=['Fixed rate', 'Flex Rate', 'Shannon'],
+               title = 'Histogram of simulated nodes',
+               ylabel='number of results', xlabel='path', savefig_path='../Results/lab7_fig2')
 
-plt.figure(3)
-plt.hist( [ [connection_full_hist.snr for connection_full_hist in connections['full']],
+############### FIGURE 3
+plot_histogram(figure_num = 3, list_data=[ [connection_full_hist.snr for connection_full_hist in connections['full']],
             [connection_not_full_hist.snr for connection_not_full_hist in connections['not_full']] ],
-          edgecolor='k', color=['g','b'], label=['Switching Matrix Full ','Switching Matrix Not Full'], bins=20 )
-plt.title('Histogram of obtained SNRs for Switching Matrix networks')
-plt.legend(loc='upper left')
-plt.ylabel('number of results')
-plt.xlabel('SNR [dB]')
-figure = plt.gcf() # get current figure
-figure.set_size_inches(8, 6)
-plt.savefig('../Results/lab7_fig3')
+               nbins=20, edge_color='k', color=['g', 'b'], label=['Switching Matrix Full ','Switching Matrix Not Full'],
+               title = 'Histogram of obtained SNRs for Switching Matrix networks',
+               ylabel='number of results', xlabel='SNR [dB]', savefig_path='../Results/lab7_fig3')
 
-plt.figure(4)
-plt.hist( [ [connection_fixed_rate_hist.snr for connection_fixed_rate_hist in connections['fixed_rate']],
+############## FIGURE 4
+plot_histogram(figure_num = 4, list_data=[ [connection_fixed_rate_hist.snr for connection_fixed_rate_hist in connections['fixed_rate']],
             [connection_flex_rate_hist.snr for connection_flex_rate_hist in connections['flex_rate']],
             [connection_shannon_hist.snr for connection_shannon_hist in connections['shannon']] ],
-          edgecolor='k', color=['y', 'm', 'r'], label=['Fixed Rate', 'Flex Rate', 'Shannon'], bins=20 )
-plt.title('Histogram of obtained SNRs for transceiver networks')
-plt.legend()
-plt.ylabel('number of results')
-plt.xlabel('SNR [dB]')
-figure = plt.gcf() # get current figure
-figure.set_size_inches(8, 6)
-plt.savefig('../Results/lab7_fig4')
+               nbins=20, edge_color='k', color=['y', 'm', 'r'], label=['Fixed Rate', 'Flex Rate', 'Shannon'],
+               title = 'Histogram of obtained SNRs for transceiver networks',
+               ylabel='number of results', xlabel='SNR [dB]', savefig_path='../Results/lab7_fig4')
 
 ##################################################################################################################
 # BIT RATE
 ##################################################################################################################
-capacity_fixed_rate = np.nansum([connections['fixed_rate'][i].bit_rate for i in range(0, len(connections['fixed_rate']))])
-avarage_fixed_rate = capacity_fixed_rate/len(connections['fixed_rate'])
-fixed_rate_label = 'Fixed Rate with avarage Rb=' + str(avarage_fixed_rate) + ' and C=' + str(capacity_fixed_rate)
+from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarage_bit_rate as cap_ave
 
-capacity_flex_rate = np.nansum([connections['flex_rate'][i].bit_rate for i in range(0, len(connections['flex_rate']))])
-avarage_flex_rate = capacity_flex_rate/len(connections['fixed_rate'])
-flex_rate_label = 'Flex Rate with avarage Rb=' + str(avarage_flex_rate) + ' and C=' + str(capacity_flex_rate)
+[capacity_fixed_rate, avarage_fixed_rate] = cap_ave(connections['fixed_rate'])
+fixed_rate_label = 'Fixed Rate with avarage Rb=' + str(avarage_fixed_rate*1e-9) + ' Gbps and C=' + str(capacity_fixed_rate*1e-9) + ' Gbps'
 
-capacity_shannon = np.nansum([connections['shannon'][i].bit_rate for i in range(0, len(connections['shannon']))])
-avarage_shannon = capacity_shannon/len(connections['shannon'])
-shannon_label = 'Shannon with avarage Rb=' + str(avarage_shannon) + ' and C=' + str(capacity_shannon)
+[capacity_flex_rate, avarage_flex_rate] = cap_ave(connections['flex_rate'])
+flex_rate_label = 'Flex Rate with avarage Rb=' + str(avarage_flex_rate*1e-9) + ' Gbps and C=' + str(capacity_flex_rate*1e-9) + ' Gbps'
 
-fig = plt.figure(5)
-fig.subplots_adjust(bottom=0.25)
-plt.hist( [ [connection_fixed_rate.bit_rate for connection_fixed_rate in connections['fixed_rate']],
+[capacity_shannon, avarage_shannon] = cap_ave(connections['shannon'])
+shannon_label = 'Shannon with avarage Rb=' + str(avarage_shannon*1e-9) + ' Gbps and C=' + str(capacity_shannon*1e-9) + ' Gbps'
+
+################## FIGURE 5
+plot_histogram(figure_num = 5, list_data=[ [connection_fixed_rate.bit_rate for connection_fixed_rate in connections['fixed_rate']],
             [connection_flex_rate.bit_rate for connection_flex_rate in connections['flex_rate']],
-            [connection_shannon.bit_rate for connection_shannon in connections['shannon']] ] , bins=10,
-          edgecolor='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label] )
-plt.title('Histogram of Bit Rates')
-plt.legend(title='Histogram of Bit Rates',bbox_to_anchor=(0.5, -0.4), loc='lower center')
-plt.xlabel('Bit rate [Gbps]')
-figure = plt.gcf() # get current figure
-figure.set_size_inches(8, 6)
-plt.savefig('../Results/lab7_fig5_bit_rates.png')
+            [connection_shannon.bit_rate for connection_shannon in connections['shannon']] ],
+               nbins=10, edge_color='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label],
+               title = 'Histogram of Bit Rates', bbox_to_anchor=(0.5, -0.35), loc='lower center', ylabel='', bottom=0.25,
+               xlabel='Bit rate [Gbps]', savefig_path='../Results/lab7_fig5_bit_rates.png')
 
 plt.show()

@@ -11,7 +11,7 @@ phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light 
 #############################################################
 
 def n_amplifier_evaluation(length):
-    n_amplifier = int(np.floor(length/span_length))
+    n_amplifier = int(np.floor(length/span_length)) # span length from parameters
     return n_amplifier
 def latency_evaluation(length):
     latency = length / phase_velocity # obtained delay in a line
@@ -46,4 +46,9 @@ def bit_rate_evaluation(GSNR_lin, strategy):
         print('ERROR in strategy definition')
         exit(5)
     return Rb
+
+def capacity_and_avarage_bit_rate(connections):
+    capacity = np.nansum( [connections[i].bit_rate for i in range(0, len(connections))] )
+    avarage_bit_rate = capacity / len(connections)
+    return [capacity, avarage_bit_rate]
 
