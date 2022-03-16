@@ -13,6 +13,9 @@ FREE = 1
 OCCUPIED = 0
 ########################################
 
+# from datetime import datetime
+# now = datetime.now()
+# date_string = now.strftime('%Y_%m_%d_%Hhr_%Mmin_%Ssec')
 ########################## path definition with path lib #####################################
 from pathlib import Path
 root = Path(__file__).parent.parent
