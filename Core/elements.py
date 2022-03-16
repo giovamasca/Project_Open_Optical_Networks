@@ -54,12 +54,28 @@ class Lightpath( SignalInformation ): # inherited class from signal information
         # if number channel = 10 -> 0 <= channel <= 9
         # there is a channel attribute more than signal information class, by the way this attribute has constrains
         # if these constrains are not respected the code exits with an error state
+        ####### LAB8 attributes
+        self._Rs = None # symbol rate
+        self._df = None # channel spacing between two adjacent frequencies
     @property
     def channel(self): # channel is a private value, once defined could not be changed
         return self._channel
     # @channel.setter
     # def channel(self, channel):
     #     self._channel=channel
+    @property
+    def Rs(self):
+        return self._Rs
+    @Rs.setter
+    def Rs(self, Rs):
+        self._Rs = Rs
+    @property
+    def df(self):
+        return self._df
+    @df.setter
+    def df(self, df):
+        self._df = df
+
 
 #### This class is for Node objects
 class Node: # class for node definition
