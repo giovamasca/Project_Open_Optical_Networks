@@ -34,4 +34,6 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     plt.xlabel(xlabel)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
-    plt.savefig(savefig_path)
+    if savefig_path:
+        plt.savefig(savefig_path)
+    # plt.show()

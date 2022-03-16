@@ -17,10 +17,18 @@ OCCUPIED = 0
 from pathlib import Path
 root = Path(__file__).parent.parent
 
+### Transceiver json files
 file_nodes_full_fixed_rate = root / 'Resources' / 'nodes_full_fixed_rate.json'
 file_nodes_full_flex_rate = root / 'Resources' / 'nodes_full_flex_rate.json'
 file_nodes_full_shannon = root / 'Resources' / 'nodes_full_shannon.json'
-
+### Traditional with and without switching matrix files
 file_nodes_full = root / 'Resources' / 'nodes_full.json'
 file_nodes_not_full = root / 'Resources' / 'nodes_not_full.json'
+
+### Results saved
+lab8_fig1 = root / 'Results' / 'lab8_fig1_node_couples_full_and_not_full.png'
+lab8_fig2 = root / 'Results' / 'lab8_fig2_node_couples_transceiver.png'
+lab8_fig3 = root / 'Results' / 'lab8_fig3_SNR_full_and_not_full.png'
+lab8_fig4 = root / 'Results' / 'lab8_fig4_SNR_transceiver.png'
+lab8_fig5 = root / 'Results' / 'lab8_fig5_bit_rates.png'
 ##############################################################################################

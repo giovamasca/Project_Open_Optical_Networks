@@ -422,18 +422,18 @@ class Network: # this is the most important class and define the network from th
 
         #plt.show()
         # put outside
-    def node_switching_analyse(self, node_label, disp=None): # this method displays the switching matrix by nodes and their connected nodes
-        print('For node ', node_label, ':')
-        node = self.nodes[node_label]
-        for input_connected_node in node.switching_matrix:
-            for output_connected_node in node.switching_matrix[input_connected_node]:
-                if output_connected_node != input_connected_node:
-                    if np.sum(node.switching_matrix[input_connected_node][output_connected_node])==OCCUPIED:
-                        if disp == None or disp == 'OFF':
-                            print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is OFF')
-                    else:
-                        if disp == None or disp == 'ON':
-                            print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is ON')
+    # def node_switching_analyse(self, node_label, disp=None): # this method displays the switching matrix by nodes and their connected nodes
+    #     print('For node ', node_label, ':')
+    #     node = self.nodes[node_label]
+    #     for input_connected_node in node.switching_matrix:
+    #         for output_connected_node in node.switching_matrix[input_connected_node]:
+    #             if output_connected_node != input_connected_node:
+    #                 if np.sum(node.switching_matrix[input_connected_node][output_connected_node])==OCCUPIED:
+    #                     if disp == None or disp == 'OFF':
+    #                         print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is OFF')
+    #                 else:
+    #                     if disp == None or disp == 'ON':
+    #                         print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is ON')
 
     def probe(self): # this method take a signal and analyze all the variables of interest without modifying state line
         nodes = self.nodes.keys() # take all node labels
