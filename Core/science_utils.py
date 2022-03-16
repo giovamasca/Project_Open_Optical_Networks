@@ -52,3 +52,6 @@ def capacity_and_avarage_bit_rate(connections):
     avarage_bit_rate = capacity / len(connections)
     return [capacity, avarage_bit_rate]
 
+def alpha_from_dB_to_linear_value(alpha_in_dB):
+    return alpha_in_dB/(10*np.log10(np.exp(1)))
+

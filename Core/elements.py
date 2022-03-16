@@ -121,9 +121,14 @@ class Line: # class for line objects
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
         self._state = np.ones(number_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
+        ### ASE parameters (to moove in parameters.py next)
         self._n_amplifier = n_amplifier_evaluation(length)
         self.gain = 16 # dB
         self.noise_figure = 3 # dB
+        ### Linear loss parameters (to moove in parameters.py next)
+        self.alfa_in_dB = 0.2 # dB/km
+        self.beta_abs_for_CD = 2.13e-26 # ps^2/km
+        self.gamma = 1.27 # 1/(W*m)
     @property
     def label(self):
         return self._label
