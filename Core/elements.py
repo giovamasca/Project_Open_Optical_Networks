@@ -54,7 +54,7 @@ class Lightpath( SignalInformation ): # inherited class from signal information
         # if number channel = 10 -> 0 <= channel <= 9
         # there is a channel attribute more than signal information class, by the way this attribute has constrains
         # if these constrains are not respected the code exits with an error state
-        ####### LAB8 attributes
+        ####### LAB 8 attributes
         self._Rs = None # symbol rate
         self._df = None # channel spacing between two adjacent frequencies
     @property
@@ -186,6 +186,9 @@ class Line: # class for line objects
 
         signal_information = node.probe(signal_information) # recall the probe method in node class, but now with new path
         return signal_information
+    def nli_generation(self, power_of_the_channel, eta_NLI):
+        NLI = np.power(power_of_the_channel, 3)*eta_NLI*self.n_amplifier
+        return NLI
 
 class Network: # this is the most important class and define the network from the file
     def __init__(self, json_file):
