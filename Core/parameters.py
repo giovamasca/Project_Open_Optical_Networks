@@ -7,6 +7,7 @@ Bn_noise_band = 12.5e9 # Ghz noise bandwith
 span_length = 80e3 # m, equal 80 km
 frequency = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
 Number_simulations = 100
+channel_spacing = 50e9 # channel spacing df from two consecutive tones
 ########################################
 ############## STATE ###################
 FREE = 1
