@@ -131,20 +131,20 @@ class Node: # class for node definition
         return signal_information # return always the signal with changes
 
 class Line: # class for line objects
-    def __init__(self, label, length):
+    def __init__(self, label, length, gain=None, noise_figure=None, loss_coefficient=None, propagation_constant=None, gamma_NL=None):
         self._label = label # this is the line label, for example 'AB'
         self._length = length # this is the length in meter for the line
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
         self._state = np.ones(number_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
-        ### ASE parameters (to moove in parameters.py next)
-        self._n_amplifier = n_amplifier_evaluation(length)
-        self.gain = 16 # dB
-        self.noise_figure = 3 # dB
-        ### Linear loss parameters (to moove in parameters.py next)
-        self.alfa_in_dB = 0.2 # dB/km
-        self.beta_abs_for_CD = 2.13e-26 # ps^2/km
-        self.gamma = 1.27 # 1/(W*m)
+        ### ASE parameters (standard values in parameters.py)
+        self._n_amplifier = self.n_amplifier_evaluation(length)
+        self._gain = gain if gain else G_gain_ct # standard 16 dB
+        self._noise_figure = noise_figure if noise_figure else NF_noise_figure_ct # standard 3 dB
+        ### Linear loss parameters (standard values in parameters.py)
+        self._alpha_in_dB = loss_coefficient if loss_coefficient else alpha_in_dB_ct # standard 0.2 dB/km
+        self._beta_abs_for_CD = propagation_constant if propagation_constant else beta_abs_for_CD_ct # standard 2.13e-26 # 1/(m*Hz^2)
+        self._gamma_non_linearity = gamma_NL if gamma_NL else gamma_non_linearity_ct # 1.27e-3 # 1/(W*m)
     @property
     def label(self):
         return self._label
@@ -160,6 +160,21 @@ class Line: # class for line objects
     @property
     def n_amplifier(self):
         return self._n_amplifier
+    @property
+    def gain(self):
+        return self._gain
+    @property
+    def noise_figure(self):
+        return self._noise_figure
+    @property
+    def alpha_in_dB(self):
+        return self._alpha_in_dB
+    @property
+    def beta_abs_for_CD(self):
+        return self._beta_abs_for_CD
+    @property
+    def gamma_non_linearity(self):
+        return self._gamma_non_linearity
     @label.setter
     def label(self, label):
         self._label=label
@@ -172,6 +187,9 @@ class Line: # class for line objects
     @state.setter
     def state(self, state):
         self._state=state
+    def n_amplifier_evaluation(self, length):  # evaluate the number of amplifiers for the line
+        n_amplifier = int(np.floor(length / span_length))  # span length from parameters
+        return n_amplifier
     def ase_generation(self):
         ASE = self.n_amplifier * (h_Plank * frequency * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain)-1) )
         return ASE

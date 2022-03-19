@@ -8,6 +8,13 @@ span_length = 80e3 # m, equal 80 km
 frequency = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
 Number_simulations = 100
 channel_spacing = 50e9 # channel spacing df from two consecutive tones
+###### LINEAR and NON-LINEARITY constants ##########
+alpha_in_dB_ct = 0.2 # dB/km
+beta_abs_for_CD_ct = 2.13e-26 # 1/(m*Hz^2)
+gamma_non_linearity_ct = 1.27e-3 # 1/(W*m)
+###### amplified line parameters #############
+G_gain_ct = 16 # dB
+NF_noise_figure_ct = 3 # dB
 ########################################
 ############## STATE ###################
 FREE = 1
