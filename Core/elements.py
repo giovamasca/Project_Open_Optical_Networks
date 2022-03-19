@@ -137,14 +137,16 @@ class Line: # class for line objects
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
         self._state = np.ones(number_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
+        ### WE CANNOT STATE THEM "A PRIORI"
         ### ASE parameters (standard values in parameters.py)
         self._n_amplifier = self.n_amplifier_evaluation(length)
         self._gain = gain if gain else G_gain_ct # standard 16 dB
         self._noise_figure = noise_figure if noise_figure else NF_noise_figure_ct # standard 3 dB
-        ### Linear loss parameters (standard values in parameters.py)
+        ### Linear and non-linear loss parameters (standard values in parameters.py)
         self._alpha_in_dB = loss_coefficient if loss_coefficient else alpha_in_dB_ct # standard 0.2 dB/km
         self._beta_abs_for_CD = propagation_constant if propagation_constant else beta_abs_for_CD_ct # standard 2.13e-26 # 1/(m*Hz^2)
         self._gamma_non_linearity = gamma_NL if gamma_NL else gamma_non_linearity_ct # 1.27e-3 # 1/(W*m)
+        self._L_effective = 1 / (2 * alpha_from_dB_to_linear_value(alpha_in_dB=self.alpha_in_dB)) # effective length
     @property
     def label(self):
         return self._label
@@ -175,6 +177,9 @@ class Line: # class for line objects
     @property
     def gamma_non_linearity(self):
         return self._gamma_non_linearity
+    @property
+    def L_effective(self):
+        return self._L_effective
     @label.setter
     def label(self, label):
         self._label=label
@@ -204,8 +209,9 @@ class Line: # class for line objects
 
         signal_information = node.probe(signal_information) # recall the probe method in node class, but now with new path
         return signal_information
-    def nli_generation(self, power_of_the_channel, eta_NLI):
-        NLI = np.power(power_of_the_channel, 3)*eta_NLI*self.n_amplifier
+    def nli_generation(self, power_of_the_channel):
+        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=number_channels, L_eff=self.L_effective)
+        NLI = np.power(power_of_the_channel, 3)*eta_NLI*self.n_amplifier*Bn_noise_band
         return NLI
 
 class Network: # this is the most important class and define the network from the file

@@ -16,6 +16,13 @@ def latency_evaluation(length):
 def noise_generation(signal_power, length): # generates noise from length and power and a very low constant
     noise_power = noise_power_spectral_density * signal_power * length
     return noise_power
+def eta_NLI_evaluation(alpha_dB=None, beta=None, gamma_NL=None, Rs=None, DeltaF=None, N_channels=None, L_eff=None):
+    alpha_linear = alpha_from_dB_to_linear_value(alpha_dB)
+    PHI_d = ((np.pi^2)/2)*(beta*(Rs^2))/alpha_linear
+    P_NL = 1/(gamma_NL*L_eff)
+    parentesys = (1/Rs)*(np.log(PHI_d)/PHI_d) + (2/DeltaF)*(np.log(N_channels)/PHI_d)
+    eta_NLI = (8/27)*np.pi*(1/(P_NL^2)) * parentesys
+    return eta_NLI
 
 def dB_to_linear_conversion_power(dB_quantity):
     return np.power(10, dB_quantity/10)
