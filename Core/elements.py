@@ -50,7 +50,7 @@ class Lightpath( SignalInformation ): # inherited class from signal information
     def __init__(self, signal_power=1.0, path=None, channel=None):
         SignalInformation.__init__(self, signal_power, path) # same initial state as signal information
         # channel goes from 0 to 9, 10 slots overall
-        self._channel = int(channel) if channel >= 0 and channel <= number_channels-1 else ( print('Error, channel',str(channel),'avoided'), exit(2) )
+        self._channel = int(channel) if channel >= 0 and channel <= number_of_active_channels - 1 else (print('Error, channel', str(channel), 'avoided'), exit(2))
         # if number channel = 10 -> 0 <= channel <= 9
         # there is a channel attribute more than signal information class, by the way this attribute has constrains
         # if these constrains are not respected the code exits with an error state
@@ -135,7 +135,7 @@ class Line: # class for line objects
         self._label = label # this is the line label, for example 'AB'
         self._length = length # this is the length in meter for the line
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
-        self._state = np.ones(number_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
+        self._state = np.ones(number_of_active_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
         ### WE CANNOT STATE THEM "A PRIORI"
         ### ASE parameters (standard values in parameters.py)
@@ -281,7 +281,7 @@ class Network: # this is the most important class and define the network from th
                 # nodes['A'].successive['AB'] is lines['AB'] object
     def restore_state_lines(self):
         for line in self.lines:
-            self.lines[line].state = np.ones(number_channels, dtype='int') # re-initialize state
+            self.lines[line].state = np.ones(number_of_active_channels, dtype='int') # re-initialize state
         # self.probe() # not changed
         self.route_space_update() # required to have correct channel availabilities
     def node_reading_from_file(self): # restore only switching matrix condition
@@ -307,7 +307,7 @@ class Network: # this is the most important class and define the network from th
         for path in self.weighted_paths['path']: # extracts each path from weighted paths
             titles.append(path) # save each path label for route space definition
             path = path.replace('->', '') # removes arrows
-            availability_per_channel = np.ones(number_channels, dtype='int') # define an initial state of all ones, that means free, on the way to refresh for condition
+            availability_per_channel = np.ones(number_of_active_channels, dtype='int') # define an initial state of all ones, that means free, on the way to refresh for condition
             # Each time will be updated this availability along path
             # if len(path)==2:
             #     availability_per_channel = self.lines[path].state
@@ -402,8 +402,8 @@ class Network: # this is the most important class and define the network from th
                         switch_matrix_address=self.nodes[actual_node].switching_matrix[previous_node][next_node]
                         if signal.channel == 0: # if channel is the first one
                             switch_matrix_address[1] = OCCUPIED
-                        elif signal.channel == number_channels - 1: # if channel is the first one
-                            switch_matrix_address[number_channels - 2] = OCCUPIED
+                        elif signal.channel == number_of_active_channels - 1: # if channel is the first one
+                            switch_matrix_address[number_of_active_channels - 2] = OCCUPIED
                         else: # others position
                             switch_matrix_address[signal.channel - 1] = OCCUPIED
                             switch_matrix_address[signal.channel + 1] = OCCUPIED
@@ -530,7 +530,7 @@ class Network: # this is the most important class and define the network from th
                 free = True # needed to remember out the while cycle that there is at least a free status or not
                 line = path[0:2] # extract line name
 
-                states_path = np.ones(number_channels, dtype='int') # this array updates states along path, array of integers
+                states_path = np.ones(number_of_active_channels, dtype='int') # this array updates states along path, array of integers
                 while len(line)>1: # if there is enough nodes to define a path, at least two nodes
 
                     # extract the states from route space for this path
@@ -542,7 +542,7 @@ class Network: # this is the most important class and define the network from th
                     path = path[1:] # update path for while (remove first node and go on)
                     line = path[0:2] # update line
                 if free==True: # only to do if at least there is one free state
-                    channels = np.array([i for i in range(0, number_channels) if states_path[i]==FREE]) # extracts positions [numbers that could be from 0 to max ch]
+                    channels = np.array([i for i in range(0, number_of_active_channels) if states_path[i] == FREE]) # extracts positions [numbers that could be from 0 to max ch]
                     if len(channels)>0: # if there are available channels it appends in list the results for dataframe
                         paths.append(path_label)
                         snrs.append(self.weighted_paths['snr'].loc[self.weighted_paths['path']==path_label].item()) # needed snr fot the corresponding path
