@@ -210,7 +210,8 @@ class Line: # class for line objects
         signal_information = node.probe(signal_information) # recall the probe method in node class, but now with new path
         return signal_information
     def nli_generation(self, power_of_the_channel):
-        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=number_channels, L_eff=self.L_effective)
+        ### maximum number of channels because it is the worst case approach
+        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=maximum_number_of_channels, L_eff=self.L_effective)
         NLI = np.power(power_of_the_channel, 3)*eta_NLI*self.n_amplifier*Bn_noise_band
         return NLI
 

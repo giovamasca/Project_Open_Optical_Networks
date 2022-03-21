@@ -1,13 +1,18 @@
 ########### GLOBAL VARIABLES ###########
+### CHANNELS
 number_channels = 10 # if number of channels changes
+maximum_number_of_channels = 96 # this is the most diffused value for DeltaF of 50 GHz
+### NOISE, BER PARAMETERS
 noise_power_spectral_density = 1e-9
 BER_target = 1e-3
-Rs_symbol_rate = 32e9 # GHz symbol rate
 Bn_noise_band = 12.5e9 # Ghz noise bandwith
+### TX PARAMETERS
+Rs_symbol_rate = 32e9 # GHz symbol rate
 span_length = 80e3 # m, equal 80 km
 frequency = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
-Number_simulations = 100
 channel_spacing = 50e9 # channel spacing df from two consecutive tones
+### SIMULATION PARAMETERS
+Number_simulations = 100
 ###### LINEAR and NON-LINEARITY constants ##########
 alpha_in_dB_ct = 0.2 # dB/km
 beta_abs_for_CD_ct = 2.13e-26 # 1/(m*Hz^2)
