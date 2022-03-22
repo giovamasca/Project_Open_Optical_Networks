@@ -460,22 +460,8 @@ class Network: # this is the most important class and define the network from th
         plt.plot(x_points, y_points, 'ob', markersize=8) # then after is plot the marker of nodes, so they will be up the lines
         for i in range(0, len(x_points)): # repeat for each node
             plt.text( x_points[i]-25000, y_points[i]+5000, node_text[i] ) # remain the text of each node label
-
         #plt.show()
         # put outside
-    # def node_switching_analyse(self, node_label, disp=None): # this method displays the switching matrix by nodes and their connected nodes
-    #     print('For node ', node_label, ':')
-    #     node = self.nodes[node_label]
-    #     for input_connected_node in node.switching_matrix:
-    #         for output_connected_node in node.switching_matrix[input_connected_node]:
-    #             if output_connected_node != input_connected_node:
-    #                 if np.sum(node.switching_matrix[input_connected_node][output_connected_node])==OCCUPIED:
-    #                     if disp == None or disp == 'OFF':
-    #                         print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is OFF')
-    #                 else:
-    #                     if disp == None or disp == 'ON':
-    #                         print('\tConnection ', input_connected_node, '->', node_label, '->', output_connected_node, ' is ON')
-
     def probe(self): # this method take a signal and analyze all the variables of interest without modifying state line
         nodes = self.nodes.keys() # take all node labels
         couples = []
@@ -638,11 +624,11 @@ class Network: # this is the most important class and define the network from th
         connection.bit_rate = Rb # set bit rate
 
         return connection
-    def calculate_bit_rate(self, path, strategy=None):
+    def calculate_bit_rate(self, lightpath, strategy=None):
         strategy = strategy if strategy else 'fixed_rate'
 
         path_label = ''
-        for node in path:
+        for node in lightpath.path:
             path_label += node + '->'
         path_label = path_label[:-2]
 
@@ -650,7 +636,9 @@ class Network: # this is the most important class and define the network from th
         GSNR_dB = self.weighted_paths['snr'].loc[self.weighted_paths['path'] == path_label].item()
         GSNR_lin = dB_to_linear_conversion_power(GSNR_dB) # in linear value
 
-        return bit_rate_evaluation(GSNR_lin, strategy)
+        bit_rate = bit_rate_evaluation(GSNR_lin, strategy)
+        lightpath.Rs = bit_rate
+        return bit_rate
 
 class Connection:  # class that define a connection between two nodes
     def __init__(self, input_node, output_node, signal_power=None, channel=None, bit_rate=None):
