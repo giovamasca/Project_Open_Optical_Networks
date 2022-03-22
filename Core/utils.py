@@ -1,6 +1,9 @@
 import random
 import matplotlib.pyplot as plt
 import os
+
+import numpy as np
+
 from Project_Open_Optical_Networks.Core.elements import Connection
 
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
@@ -24,6 +27,29 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         # print('Evaluation in progress: ', np.round_(i/Numb_sim*100), ' %', end='\r')
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
+
+def number_blocking_events_evaluation(connection_list):
+    blocking_events = sum(connection.channel is None for connection in connection_list)
+    # blocking_events = sum(connection.latency is np.NaN for connection in connection_list)
+    return blocking_events
+def connection_list_data_extractor(connection_list, type_data):
+    ############# EXTRACTS LIST OF DATA FROM LIST OF CONNECTIONS ###############
+    ### Setting properties:
+    ### 'I/O' for input and output node extraction
+    ### 'SNR' for SNR extraction
+    ### 'LAT' for latency extraction
+    ### 'Rb' for bit rate extraction
+    ### if needed other implementations possible
+    list_data = ''
+    if type_data == 'I/O':
+        list_data = [connection.input + connection.output for connection in connection_list]
+    elif type_data == 'SNR':
+        list_data = [connection.snr for connection in connection_list]
+    elif type_data == 'LAT':
+        list_data = [connection.latency for connection in connection_list]
+    elif type_data == 'Rb':
+        list_data = [connection.bit_rate for connection in connection_list]
+    return list_data
 
 def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title, ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None):
     fig = plt.figure(figure_num)
