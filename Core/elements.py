@@ -138,7 +138,7 @@ class Line: # class for line objects
         self._state = np.ones(number_of_active_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
         ### WE CANNOT STATE THEM "A PRIORI"
-        ### ASE parameters (standard values in parameters.py)
+        ### ASE parameters and NODE parameters NF and G (standard values in parameters.py)
         self._n_amplifier = self.n_amplifier_evaluation(length)
         self._gain = gain if gain else G_gain_ct # standard 16 dB
         self._noise_figure = noise_figure if noise_figure else NF_noise_figure_ct # standard 3 dB
@@ -147,6 +147,11 @@ class Line: # class for line objects
         self._beta_abs_for_CD = propagation_constant if propagation_constant else beta_abs_for_CD_ct # standard 2.13e-26 # 1/(m*Hz^2)
         self._gamma_non_linearity = gamma_NL if gamma_NL else gamma_non_linearity_ct # 1.27e-3 # 1/(W*m)
         self._L_effective = 1 / (2 * alpha_from_dB_to_linear_value(alpha_in_dB=self.alpha_in_dB)) # effective length
+        #### ETA NLI
+        ### maximum number of channels because it is the worst case approach
+        self._eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD,
+                                     gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing,
+                                     N_channels=maximum_number_of_channels, L_eff=self.L_effective)
     @property
     def label(self):
         return self._label
@@ -180,6 +185,9 @@ class Line: # class for line objects
     @property
     def L_effective(self):
         return self._L_effective
+    @property
+    def eta_NLI(self):
+        return self._eta_NLI
     @label.setter
     def label(self, label):
         self._label=label
@@ -200,13 +208,16 @@ class Line: # class for line objects
         noise_power = self.ase_generation() + self.nli_generation() # supposed transparency condition, btw having gain and loss we could define a better model in a different moment
         return noise_power
     def ase_generation(self):
-        ASE = self.n_amplifier * (h_Plank * frequency * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain)-1) )
+        ASE = self.n_amplifier * (h_Plank * frequency_C_band * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain) - 1))
         return ASE
     def nli_generation(self, power_of_the_channel):
-        ### maximum number of channels because it is the worst case approach
-        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=maximum_number_of_channels, L_eff=self.L_effective)
-        NLI = np.power(power_of_the_channel, 3) * eta_NLI * self.n_amplifier * Bn_noise_band
+        NLI = np.power(power_of_the_channel, 3) * self.eta_NLI * self.n_amplifier * Bn_noise_band
         return NLI
+    def optimized_launch_power(self):
+        L_dB = self.alpha_in_dB * self.length
+        argument = dB_to_linear_conversion_power(self.noise_figure) * np.power(10, -L_dB/10) * h_Plank * frequency_C_band / ( 2 * self.eta_NLI )
+        P_out_line = np.power(argument, 1/3)
+        return P_out_line
     def probe(self, signal_information): # this function is called by node method
         latency = latency_evaluation(self.length) # generates latency for current line
         noise_power = self.noise_generation(signal_power=signal_information.signal_power) # generates noise, requires signal power

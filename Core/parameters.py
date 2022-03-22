@@ -9,7 +9,7 @@ Bn_noise_band = 12.5e9 # Ghz noise bandwith
 ### TX PARAMETERS
 Rs_symbol_rate = 32e9 # GHz symbol rate
 span_length = 80e3 # m, equal 80 km
-frequency = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
+frequency_C_band = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
 channel_spacing = 50e9 # channel spacing df from two consecutive tones
 ### SIMULATION PARAMETERS
 Number_simulations = 100

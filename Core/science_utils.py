@@ -8,6 +8,7 @@ from Project_Open_Optical_Networks.Core.parameters import *
 ##################### Constant Values #######################
 phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light speed and a ratio
 # n = 1.5, so c/n ~ (2/3)*c
+P_base = h_Plank * frequency_C_band * Bn_noise_band
 #############################################################
 
 def latency_evaluation(length):
