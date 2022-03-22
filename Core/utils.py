@@ -1,5 +1,6 @@
 import random
 import matplotlib.pyplot as plt
+import os
 from Project_Open_Optical_Networks.Core.elements import Connection
 
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
@@ -34,6 +35,10 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     plt.xlabel(xlabel)
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
+
+    savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path:
+        if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
+            os.makedirs('../Results')
         plt.savefig(savefig_path)
     # plt.show()
