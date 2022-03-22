@@ -125,6 +125,7 @@ class Node: # class for node definition
             label = path[0:2] # the actual line is defined by the first teo nodes of path
             line = self.successive[label] # line object address is in successive with specific label (defined in connect() method)
             # we extract line of interest defined by actual line, for example we are in node A and path[:2]=AB, so line will be AB line object address
+            signal_information.signal_power = line.optimized_launch_power() # each time the node evaluate the optimum launch power
             signal_information.path_update() # remove first node on path
             signal_information = line.probe(signal_information) # to continue probe it recall same method in line class (line is AB in the example, so it will propagate on these line)
         # probe propagation will continue until the path as at least two node, if it has only one node the probe is finished and return all recursive functions
