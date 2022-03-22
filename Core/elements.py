@@ -195,12 +195,21 @@ class Line: # class for line objects
     def n_amplifier_evaluation(self, length):  # evaluate the number of amplifiers for the line
         n_amplifier = int(np.floor(length / span_length))  # span length from parameters
         return n_amplifier
+    def noise_generation(self, signal_power):  # generates noise from length and power and a very low constant
+        # noise_power = noise_power_spectral_density * signal_power * self.length  # previous format
+        noise_power = self.ase_generation() + self.nli_generation() # supposed transparency condition, btw having gain and loss we could define a better model in a different moment
+        return noise_power
     def ase_generation(self):
         ASE = self.n_amplifier * (h_Plank * frequency * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain)-1) )
         return ASE
+    def nli_generation(self, power_of_the_channel):
+        ### maximum number of channels because it is the worst case approach
+        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=maximum_number_of_channels, L_eff=self.L_effective)
+        NLI = np.power(power_of_the_channel, 3) * eta_NLI * self.n_amplifier * Bn_noise_band
+        return NLI
     def probe(self, signal_information): # this function is called by node method
         latency = latency_evaluation(self.length) # generates latency for current line
-        noise_power = noise_generation(signal_power=signal_information.signal_power, length=self.length) # generates noise, requires signal power
+        noise_power = self.noise_generation(signal_power=signal_information.signal_power) # generates noise, requires signal power
         signal_information.increment_latency(latency) # update latency accumulated in signal
         signal_information.increment_noise(noise_power) # update noise accumulated in signal
 
@@ -209,11 +218,6 @@ class Line: # class for line objects
 
         signal_information = node.probe(signal_information) # recall the probe method in node class, but now with new path
         return signal_information
-    def nli_generation(self, power_of_the_channel):
-        ### maximum number of channels because it is the worst case approach
-        eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD, gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing, N_channels=maximum_number_of_channels, L_eff=self.L_effective)
-        NLI = np.power(power_of_the_channel, 3)*eta_NLI*self.n_amplifier*Bn_noise_band
-        return NLI
 
 class Network: # this is the most important class and define the network from the file
     def __init__(self, json_file):

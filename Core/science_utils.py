@@ -13,9 +13,6 @@ phase_velocity = 2 / 3 * speed_light # velocity of the line is defined by light 
 def latency_evaluation(length):
     latency = length / phase_velocity # obtained delay in a line
     return latency
-def noise_generation(signal_power, length): # generates noise from length and power and a very low constant
-    noise_power = noise_power_spectral_density * signal_power * length
-    return noise_power
 def eta_NLI_evaluation(alpha_dB=None, beta=None, gamma_NL=None, Rs=None, DeltaF=None, N_channels=None, L_eff=None):
     alpha_linear = alpha_from_dB_to_linear_value(alpha_dB)
     PHI_d = ((np.pi^2)/2)*(beta*(Rs^2))/alpha_linear

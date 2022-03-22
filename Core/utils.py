@@ -1,9 +1,6 @@
 import random
 import matplotlib.pyplot as plt
 import os
-
-import numpy as np
-
 from Project_Open_Optical_Networks.Core.elements import Connection
 
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
