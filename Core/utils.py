@@ -14,8 +14,8 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         while n2 == n1:
             n2 = random.randint(0, len(nodes_gener) - 1)  # repeat the random evaluation until there is a couple of nodes, not same values
 
-        connection_generated = Connection(nodes_gener[n1], nodes_gener[n2], 1)  # creates connection
-        connection_generated = network.stream(connection_generated, 'snr', use_state=True)  # stream it with state on and snr set
+        connection_generated = Connection(input_node=nodes_gener[n1], output_node=nodes_gener[n2], signal_power=1e-3)  # creates connection
+        connection_generated = network.stream(connection=connection_generated, set_latency_or_snr='snr', use_state=True)  # stream it with state on and snr set
         # if connection_generated.latency==np.NaN:
         #     continue # avoid this connection
         # with np.NaN the histograms avoid the corresponding values

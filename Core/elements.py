@@ -484,7 +484,7 @@ class Network: # this is the most important class and define the network from th
                     title += node + '->' # this title requires an arrow to define direction
                 titles.append(title[:-2]) # removes last arrow
 
-                signal = SignalInformation(1, path) # in point 5 of lab 3 is required 1 mW of signal power, by the way is not possible to view noise power
+                signal = SignalInformation(1e-3, path) # in point 5 of lab 3 is required 1 mW of signal power, by the way is not possible to view noise power
                 # let's define signal power as 1 W, the noise will be proportional to it
                 # SNR doesn't change
 
