@@ -16,10 +16,10 @@ def latency_evaluation(length):
     return latency
 def eta_NLI_evaluation(alpha_dB=None, beta=None, gamma_NL=None, Rs=None, DeltaF=None, N_channels=None, L_eff=None):
     alpha_linear = alpha_from_dB_to_linear_value(alpha_dB)
-    PHI_d = ((np.pi^2)/2)*(beta*(Rs^2))/alpha_linear
+    PHI_d = ((np.power(np.pi,2))/2)*(beta*(np.power(Rs,2)))/alpha_linear
     P_NL = 1/(gamma_NL*L_eff)
     parentesys = (1/Rs)*(np.log(PHI_d)/PHI_d) + (2/DeltaF)*(np.log(N_channels)/PHI_d)
-    eta_NLI = (8/27)*np.pi*(1/(P_NL^2)) * parentesys
+    eta_NLI = (8/27)*np.pi*(1/(np.power(P_NL,2))) * parentesys
     return eta_NLI
 
 def dB_to_linear_conversion_power(dB_quantity):
