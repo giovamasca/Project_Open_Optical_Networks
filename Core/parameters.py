@@ -14,7 +14,7 @@ channel_spacing = 50e9 # channel spacing df from two consecutive tones
 ### SIMULATION PARAMETERS
 Number_simulations = 100
 ###### LINEAR and NON-LINEARITY constants ##########
-alpha_in_dB_ct = 0.2 # dB/km
+alpha_in_dB_ct = 0.2e-3 # dB/m
 beta_abs_for_CD_ct = 2.13e-26 # 1/(m*Hz^2)
 gamma_non_linearity_ct = 1.27e-3 # 1/(W*m)
 ###### amplified line parameters #############
