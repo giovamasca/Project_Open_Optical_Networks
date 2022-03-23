@@ -206,7 +206,7 @@ class Line: # class for line objects
         return n_amplifier
     def noise_generation(self, signal_power):  # generates noise from length and power and a very low constant
         # noise_power = noise_power_spectral_density * signal_power * self.length  # previous format
-        noise_power = self.ase_generation() + self.nli_generation() # supposed transparency condition, btw having gain and loss we could define a better model in a different moment
+        noise_power = self.ase_generation() + self.nli_generation(signal_power) # supposed transparency condition, btw having gain and loss we could define a better model in a different moment
         return noise_power
     def ase_generation(self):
         ASE = self.n_amplifier * (h_Plank * frequency_C_band * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain) - 1))
