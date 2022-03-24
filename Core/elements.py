@@ -597,8 +597,16 @@ class Network: # this is the most important class and define the network from th
         else:
             path = path.replace('->','')
 
+            channel = None
+            if use_state:  # verify the use state condition
+                channel = best['channels']  # extracts channels from best
+                channel = channel[0]  # choose the first one available
+                signal = Lightpath(connection.signal_power, path, channel)  # creates lightpath
+            else:
+                signal = SignalInformation(connection.signal_power, path)  # creates signal without channel
+
             #### evaluation of bit rate
-            Rb = self.calculate_bit_rate(path=path, strategy=self.nodes[path[0]].transceiver) # evaluate the bit rate of path with the transceiver condition of first node
+            Rb = self.calculate_bit_rate(lightpath=signal, strategy=self.nodes[path[0]].transceiver) # evaluate the bit rate of path with the transceiver condition of first node
             if Rb == 0: # if bit rate null let's avoid connection
                 remove_connection = True
         if remove_connection: # if at least one condition on bit rate and path is not respected, let's avoid it
@@ -607,14 +615,6 @@ class Network: # this is the most important class and define the network from th
             connection.channel = None
             connection.bit_rate = np.NaN
             return connection
-
-        channel = None
-        if use_state: # verify the use state condition
-            channel = best['channels'] # extracts channels from best
-            channel = channel[0] # choose the first one available
-            signal = Lightpath(connection.signal_power, path, channel) # creates lightpath
-        else:
-            signal = SignalInformation(connection.signal_power, path) # creates signal without channel
 
         self.propagate(signal) # propagation of signal or lightpath
 
