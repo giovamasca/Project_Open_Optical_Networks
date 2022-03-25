@@ -1,6 +1,9 @@
 import random
 import matplotlib.pyplot as plt
 import os
+
+import numpy as np
+
 from Project_Open_Optical_Networks.Core.elements import Connection
 
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
@@ -49,6 +52,8 @@ def connection_list_data_extractor(connection_list, type_data):
     return list_data
 
 def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title, ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None):
+    list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
+
     fig = plt.figure(figure_num)
     fig.subplots_adjust(bottom=bottom)
     plt.hist( list_data, bins=nbins, edgecolor=edge_color, color = color, label = label)

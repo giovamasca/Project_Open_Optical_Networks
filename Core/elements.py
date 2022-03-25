@@ -431,7 +431,7 @@ class Network: # this is the most important class and define the network from th
 
         ########### because we have done it at the beginning with weighted paths
         ##### THEN CONITNUE AFTER IF CONDITION OF ATTRIBUTE CHANNEL with noise power, that is required also for occupied
-        signal.noise_power = self.weighted_paths.loc[index_weighted_paths, 'noise'] * signal.signal_power  # because is normalized to one we multiply it for signal power
+        signal.noise_power = self.weighted_paths.loc[index_weighted_paths, 'noise'] #* signal.signal_power  # because is normalized to one we multiply it for signal power
 
         #################### TO HAVE NOT A DYNAMIC SWITCHING MATRIX LET'S COMMENT LINE BELOW ###########################
         # self.node_reading_from_file() # made available if not dynamic
