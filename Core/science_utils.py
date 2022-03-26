@@ -49,9 +49,9 @@ def bit_rate_evaluation(GSNR_lin, strategy):
         exit(5)
     return Rb
 
-def capacity_and_avarage_bit_rate(connections):
-    capacity = np.nansum( [connections[i].bit_rate for i in range(0, len(connections))] )
-    avarage_bit_rate = capacity / len(connections)
+def capacity_and_avarage_bit_rate(connections_list):
+    capacity = np.nansum( [connections_list[i].bit_rate for i in range(0, len(connections_list))] )
+    avarage_bit_rate = capacity / len(connections_list)
     return [capacity, avarage_bit_rate]
 
 def alpha_from_dB_to_linear_value(alpha_in_dB):

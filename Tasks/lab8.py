@@ -1,4 +1,4 @@
-import numpy as np
+# import numpy as np
 
 from Project_Open_Optical_Networks.Core.elements import Network #, Connection
 from Project_Open_Optical_Networks.Core.parameters import *

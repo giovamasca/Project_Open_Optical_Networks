@@ -4,8 +4,11 @@ import os
 
 import numpy as np
 
-from Project_Open_Optical_Networks.Core.elements import Connection
+from Project_Open_Optical_Networks.Core.elements import Connection, Network
 
+def network_generation_from_file(network_file):
+    network = Network(network_file)
+    return network
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
     nodes_gener = list(network.nodes.keys())  # extracts all nodes
 
@@ -51,8 +54,9 @@ def connection_list_data_extractor(connection_list, type_data):
         list_data = [connection.bit_rate for connection in connection_list]
     return list_data
 
-def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title, ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None):
-    list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
+def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False):
+    if NaN_display:
+        list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
     fig = plt.figure(figure_num)
     fig.subplots_adjust(bottom=bottom)
@@ -64,7 +68,7 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
 
-    savefig_path = None ##### AVOIDED SAVE AS DEBUG
+    # savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path:
         if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
             os.makedirs('../Results')
