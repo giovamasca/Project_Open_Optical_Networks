@@ -262,6 +262,12 @@ class Network: # this is the most important class and define the network from th
         self.connect()
         self.probe()
         self.route_space_update()
+        ### TRAFFIC MATRIX
+        # self._traffic_matrix = dict(zip(self.nodes.keys(), [dict(zip(self.nodes.keys(), [None]*len(self.nodes.keys())))]*len(self.nodes.keys())))
+        ### doesn't work, same dict as argument fo first dict
+        self._traffic_matrix = {}
+        #initialization of traffic matrix with nodes dictionary of nodes dictionary, all components set to None
+        self.restart_traffic_matrix(M=1)
     @property
     def nodes(self):
         return self._nodes
@@ -277,6 +283,9 @@ class Network: # this is the most important class and define the network from th
     @property
     def file_name(self):
         return self._file_name
+    @property
+    def traffic_matrix(self):
+        return self._traffic_matrix
     @nodes.setter
     def nodes(self, nodes):
         self._nodes=nodes
@@ -289,6 +298,9 @@ class Network: # this is the most important class and define the network from th
     @route_space.setter
     def route_space(self, route_space):
         self._route_space = route_space
+    @traffic_matrix.setter
+    def traffic_matrix(self, traffic_matrix):
+        self._traffic_matrix = traffic_matrix
     def connect(self): # this method connect each line and node, creating all successive attributes
         # take each node and make successive, so for each line, cycle for as before
         for first_node in self.nodes: # for each node
@@ -302,6 +314,16 @@ class Network: # this is the most important class and define the network from th
                 self.nodes[first_node].successive[line_label] = self.lines[line_label]
                 # for example lines['AB'].successive['B'] is nodes['B'] object
                 # nodes['A'].successive['AB'] is lines['AB'] object
+    def restart_traffic_matrix(self, M):
+        for node in self.nodes:
+            self.traffic_matrix[node] = {}
+        for node_i in self.traffic_matrix:
+            for node_j in self.nodes:
+                if node_i == node_j:
+                    self.traffic_matrix[node_i][node_j] = 0
+                else:
+                    self.traffic_matrix[node_i][node_j] = 100*M # Gbps
+        print(self.traffic_matrix)
     def restore_state_lines(self):
         for line in self.lines:
             self.lines[line].state = np.ones(number_of_active_channels, dtype='int') # re-initialize state
