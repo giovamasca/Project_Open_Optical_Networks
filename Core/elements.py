@@ -219,9 +219,8 @@ class Line: # class for line objects
         L_dB = self.alpha_in_dB * span_length # depends on each span the loss, then positive index as slide 13 set 9
         ### L_dB is equivalent to gain!! transparency
         # last span is not refined, has a larger margin
-        argument = self.n_amplifier / self.n_amplifier * dB_to_linear_conversion_power(self.noise_figure) * np.power(10, L_dB/10) * h_Plank * frequency_C_band / ( 2 * self.eta_NLI )
-        ### I AM NOT SURE IF N_AMPLIFIER SHOULD BE PUT ABOVE
-        # by Carena, slide 49 set 9, P_optimum = np.power(P_ase/(2*eta_NLI), 1/3)
+        argument = self.ase_generation() / ( 2 * self.eta_NLI )
+        #by slide 49 set 8, P_optimum = np.power(P_ase/(2*eta_NLI), 1/3)
 
         ### the optimum launch power is the same formula of the slide done N times, where N is the number of spans.
         P_out_line = np.power(argument, 1/3)
@@ -267,7 +266,7 @@ class Network: # this is the most important class and define the network from th
         ### doesn't work, same dict as argument fo first dict
         self._traffic_matrix = {}
         #initialization of traffic matrix with nodes dictionary of nodes dictionary, all components set to None
-        self.restart_traffic_matrix(M=1)
+        # self.restart_traffic_matrix(M=1) # just for debug
     @property
     def nodes(self):
         return self._nodes
