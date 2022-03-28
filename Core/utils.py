@@ -12,7 +12,7 @@ def network_generation_from_file(network_file):
 def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
     nodes_gener = list(network.nodes.keys())  # extracts all nodes
 
-    avarage_bit_rate = 0
+    # avarage_bit_rate = 0
     connections_generated = []  # defined a list of connections
     for i in range(0, Numb_sim): # do a number of simulations equal to Numb_sim
         n1 = random.randint(0, len(nodes_gener) - 1)  # any position is ok
@@ -26,8 +26,7 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         #     continue # avoid this connection
         # with np.NaN the histograms avoid the corresponding values
         connections_generated.append(connection_generated) # appends connection
-        avarage_bit_rate += connection_generated.bit_rate
-        # print('Evaluation in progress: ', np.round_(i/Numb_sim*100), ' %', end='\r')
+        # avarage_bit_rate += connection_generated.bit_rate
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
 

@@ -2,11 +2,12 @@ import json # to read and write json files
 # import numpy as np # to use array and other facilities matlab-like
 import matplotlib.pyplot as plt # to plot
 import pandas as pd # for dataframes
+import random as rnd
 
 from Project_Open_Optical_Networks.Core.science_utils import * # and also import parameters as defined in science utils
 
 class SignalInformation: # this is the class of the signal
-    def __init__(self, signal_power=1.0, path=None):
+    def __init__(self, signal_power=1e-3, path=None):
         self._signal_power = float(signal_power) # Power of the transmitted signal (therefore the power along the line)
         self._noise_power = float(0) # noise floor, will be defined by length of each line and power of signal
         self._latency = float(0) # latency in seconds
@@ -219,7 +220,7 @@ class Line: # class for line objects
         L_dB = self.alpha_in_dB * span_length # depends on each span the loss, then positive index as slide 13 set 9
         ### L_dB is equivalent to gain!! transparency
         # last span is not refined, has a larger margin
-        argument = self.ase_generation() / ( 2 * self.eta_NLI )
+        argument = dB_to_linear_conversion_power(self.noise_figure) * np.power(10, L_dB/10) * h_Plank * frequency_C_band / ( 2 * self.eta_NLI )
         #by slide 49 set 8, P_optimum = np.power(P_ase/(2*eta_NLI), 1/3)
 
         ### the optimum launch power is the same formula of the slide done N times, where N is the number of spans.
@@ -238,7 +239,7 @@ class Line: # class for line objects
         return signal_information
 
 class Network: # this is the most important class and define the network from the file
-    def __init__(self, json_file):
+    def __init__(self, json_file, M_for_traffic_matrix=None):
         self._nodes = {} # dictionary of nodes of network
         self._lines = {} # dictionary of lines of networks
         # then there are the dataframes for latency/snr (weighted paths) and state per channel (route space)
@@ -266,7 +267,8 @@ class Network: # this is the most important class and define the network from th
         ### doesn't work, same dict as argument fo first dict
         self._traffic_matrix = {}
         #initialization of traffic matrix with nodes dictionary of nodes dictionary, all components set to None
-        # self.restart_traffic_matrix(M=1) # just for debug
+        self.restart_traffic_matrix(M=M_for_traffic_matrix) # just for debug
+        self.connection_with_traffic_matrix()
     @property
     def nodes(self):
         return self._nodes
@@ -313,7 +315,8 @@ class Network: # this is the most important class and define the network from th
                 self.nodes[first_node].successive[line_label] = self.lines[line_label]
                 # for example lines['AB'].successive['B'] is nodes['B'] object
                 # nodes['A'].successive['AB'] is lines['AB'] object
-    def restart_traffic_matrix(self, M):
+    def restart_traffic_matrix(self, M=None):
+        M = M if M else 1 # default definition
         for node in self.nodes:
             self.traffic_matrix[node] = {}
         for node_i in self.traffic_matrix:
@@ -322,7 +325,42 @@ class Network: # this is the most important class and define the network from th
                     self.traffic_matrix[node_i][node_j] = 0
                 else:
                     self.traffic_matrix[node_i][node_j] = 100*M # Gbps
-        print(self.traffic_matrix)
+        # print(self.traffic_matrix)
+    def connection_with_traffic_matrix(self, set_latency_or_snr=None, use_state=None):
+        ####### inputs default #########
+        snr_or_latency = set_latency_or_snr if set_latency_or_snr else 'snr'
+        use_state = use_state if use_state else False
+        ################################
+        if self.traffic_matrix_full_filled():
+            return None # if there is no possible connection, return None
+        nodes_gener = list(self.nodes.keys())  # extracts all nodes
+        [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels
+        while (self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
+            [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
+        connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection
+        connection_generated = self.stream(connection=connection_generated, set_latency_or_snr=snr_or_latency, use_state=use_state)
+        return connection_generated
+    def traffic_matrix_full_filled(self): # return a False state if in the matrix there are all 0 or inf values
+        # ############# DEBUG #############
+        # for input_node in self.traffic_matrix:
+        #     for output_node in self.traffic_matrix[input_node]:
+        #         self.traffic_matrix[input_node][output_node] == 0
+        # #################################
+        full = True
+        for input_node in self.traffic_matrix:
+            for output_node in self.traffic_matrix[input_node]:
+                if (self.traffic_matrix[input_node][output_node] != 0 and self.traffic_matrix[input_node][output_node] != np.inf):
+                    full = False
+                    return full
+        return full
+    def random_generation(self, nodes_gener):
+        n1 = rnd.randint(0, len(nodes_gener) - 1)  # any position is ok
+        n2 = rnd.randint(0, len(nodes_gener) - 1)
+        while n2 == n1:
+            n2 = rnd.randint(0, len(nodes_gener) - 1)  # repeat the random evaluation until there is a couple of nodes, not same values
+        input_node = nodes_gener[n1]
+        output_node = nodes_gener[n2]
+        return [input_node, output_node]
     def restore_state_lines(self):
         for line in self.lines:
             self.lines[line].state = np.ones(number_of_active_channels, dtype='int') # re-initialize state
@@ -608,7 +646,7 @@ class Network: # this is the most important class and define the network from th
     def stream(self, connection, set_latency_or_snr=None, use_state=None): # this function streams a conncetion with specific set
         use_state = use_state if use_state else False # if we want to use the state of the connections, let's put use_state=True
         #connection = Connection(input_node, output_node, signal_power)
-        set_lat_snr = set_latency_or_snr if set_latency_or_snr else 'latency' # select which set we want to use, if not defined is 'latency'
+        set_lat_snr = set_latency_or_snr if set_latency_or_snr else 'snr' # select which set we want to use, if not defined is 'latency'
         remove_connection = False # if some conditions are not satisfied let's avoid propagation
         Rb = 0 # initialized Rb
 
@@ -672,7 +710,7 @@ class Connection:  # class that define a connection between two nodes
     def __init__(self, input_node, output_node, signal_power=None, channel=None, bit_rate=None):
         self._input = input_node  # starting node
         self._output = output_node  # ending node
-        self._signal_power = signal_power if signal_power else float(1)  # signal power definition, if not defined set to 1 W
+        self._signal_power = signal_power if signal_power else float(1e-3)  # signal power definition, if not defined set to 1 mW
         self._latency = float(0)  # latency set to 0
         self._snr = float(0)  # snr set to 0
         self._channel = channel if channel else int(0) # channel of interest if defined
