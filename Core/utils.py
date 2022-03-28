@@ -29,7 +29,15 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         # avarage_bit_rate += connection_generated.bit_rate
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
-
+def random_generation_with_traffic_matrix(network, M_traffic=None):
+    network.reset(M_traffic_matrix=M_traffic)
+    connections = []
+    # i=0
+    while not network.traffic_matrix_saturated(): # generates a list until network is saturated
+        connections.append(network.connection_with_traffic_matrix(set_latency_or_snr='snr', use_state=True))
+        # i += 1
+        # print(i)
+    return connections
 def number_blocking_events_evaluation(connection_list):
     blocking_events = sum(connection.channel is None for connection in connection_list)
     # blocking_events = sum(connection.latency is np.NaN for connection in connection_list)
