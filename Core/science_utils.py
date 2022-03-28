@@ -34,20 +34,20 @@ def bit_rate_evaluation(GSNR_lin, strategy):
     third_formula = 10 * Rs_symbol_rate / Bn_noise_band * (np.power(erfcinv(8 / 3 * BER_target), 2))
     if strategy == 'fixed_rate':
         if GSNR_lin >= first_formula:
-            Rb = 100e9 # Gbps
+            Rb = 100 # Gbps
     elif strategy == 'flex_rate':
         if GSNR_lin >= first_formula and GSNR_lin < second_formula:
-            Rb = 100e9
+            Rb = 100
         elif GSNR_lin >= second_formula and GSNR_lin < third_formula:
-            Rb = 200e9
+            Rb = 200
         elif GSNR_lin >= third_formula:
-            Rb = 400e9
+            Rb = 400
     elif strategy == 'shannon':
-        Rb = 2 * Rs_symbol_rate * np.log2(1 + GSNR_lin * Rs_symbol_rate / Bn_noise_band)
+        Rb = 2 * Rs_symbol_rate * np.log2(1 + GSNR_lin * Rs_symbol_rate / Bn_noise_band) * 1e-9 # Gbps
     else:
         print('ERROR in strategy definition')
         exit(5)
-    return Rb
+    return Rb # returned in Gbps
 
 def capacity_and_avarage_bit_rate(connections_list):
     capacity = np.nansum( [connections_list[i].bit_rate for i in range(0, len(connections_list))] )
