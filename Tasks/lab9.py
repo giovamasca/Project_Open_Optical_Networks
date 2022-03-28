@@ -54,4 +54,22 @@ print()
 print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]))
 print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]))
 print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections[shannon]))
-plt.show() # has to be put at the end
+plt.draw() # has to be put at the end
+
+#################### Point 7
+connections_fixed_per_M = []
+connections_flex_per_M = []
+connections_shannon_per_M = []
+for M in range(1, 10):
+    print('\tFor M = ', str(M), ':')
+    connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M)
+    print('Total connections for fixed_rate network: ', len(connections_fixed_rate))
+    print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections_fixed_rate))
+    connections_flex_rate = random_generation_with_traffic_matrix(network=network_flex_rate, M_traffic=M)
+    print('Total connections for flex_rate network: ', len(connections_flex_rate))
+    print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections_flex_rate))
+    connections_shannon = random_generation_with_traffic_matrix(network=network_shannon, M_traffic=M)
+    print('Total connections for shannon network: ', len(connections_shannon))
+    print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections_shannon))
+
+plt.show()
