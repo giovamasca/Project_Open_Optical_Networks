@@ -248,18 +248,18 @@ class Network: # this is the most important class and define the network from th
         self._file_name = json_file # to restore switching matrix
 
         self.node_reading_from_file() # read file and creates nodes
-        for first_node in self.nodes: # first node is node label, being equal to key
-            for second_node in self.nodes[first_node].connected_nodes: # for each connected node is defined a line and successives
-                line_label = first_node + second_node # line by starting node and its connected one
-                # the length is evaluated thanks to numpy array:
-                # first of all there is a difference between x and y (x_length = x2 - x1, y_length = y2 - y1), they may be negative
-                # then is obtained the power of two of each coordinate length: x_length^2, y_length^2, no abs required thanks to it
-                # then they are added, for Pythagorean theorem: sum=(x_length^2)+(y_length^2)
-                # then the length is obtained with square root: sqrt( sum )
-                line_length = np.sqrt( np.sum( np.power( np.array(self.nodes[first_node].position) - np.array(self.nodes[second_node].position) , 2) ) )
-                self.lines[line_label] = Line(line_label, line_length) # each line is defined
+        # for first_node in self.nodes: # first node is node label, being equal to key
+        #     for second_node in self.nodes[first_node].connected_nodes: # for each connected node is defined a line and successives
+        #         line_label = first_node + second_node # line by starting node and its connected one
+        #         # the length is evaluated thanks to numpy array:
+        #         # first of all there is a difference between x and y (x_length = x2 - x1, y_length = y2 - y1), they may be negative
+        #         # then is obtained the power of two of each coordinate length: x_length^2, y_length^2, no abs required thanks to it
+        #         # then they are added, for Pythagorean theorem: sum=(x_length^2)+(y_length^2)
+        #         # then the length is obtained with square root: sqrt( sum )
+        #         line_length = np.sqrt( np.sum( np.power( np.array(self.nodes[first_node].position) - np.array(self.nodes[second_node].position) , 2) ) )
+        #         self.lines[line_label] = Line(line_label, line_length) # each line is defined
         # call automatically the other methods of initialization
-        self.connect()
+        # self.connect()
         self.probe()
         self.route_space_update()
         ### TRAFFIC MATRIX
@@ -315,6 +315,12 @@ class Network: # this is the most important class and define the network from th
                 self.nodes[first_node].successive[line_label] = self.lines[line_label]
                 # for example lines['AB'].successive['B'] is nodes['B'] object
                 # nodes['A'].successive['AB'] is lines['AB'] object
+    def reset(self, M_traffic_matrix):
+        self.node_reading_from_file()
+        # self.probe()
+        self.restore_state_lines()
+        # self.route_space_update()
+        self.restart_traffic_matrix(M=M_traffic_matrix)
     def restart_traffic_matrix(self, M=None):
         M = M if M else 1 # default definition
         for node in self.nodes:
@@ -335,7 +341,7 @@ class Network: # this is the most important class and define the network from th
         #     return None # if there is no possible connection, return None
         nodes_gener = list(self.nodes.keys())  # extracts all nodes
         [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels
-        while ( self.traffic_matrix[input_node][output_node]==0 ): # or self.traffic_matrix[input_node][output_node]==np.inf):
+        while ( self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
             [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
         connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection
         connection_generated = self.stream(connection=connection_generated, set_latency_or_snr=snr_or_latency, use_state=use_state)
@@ -379,6 +385,18 @@ class Network: # this is the most important class and define the network from th
             if 'transceiver' in imported_data[key]: # verify if it is defined the transceiver instance
                 node_dict['transceiver'] = imported_data[key]['transceiver']
             self.nodes[key] = Node(node_dict) # dictionary as input of node class
+        ################################################################################################################à
+        for first_node in self.nodes: # first node is node label, being equal to key
+            for second_node in self.nodes[first_node].connected_nodes: # for each connected node is defined a line and successives
+                line_label = first_node + second_node # line by starting node and its connected one
+                # the length is evaluated thanks to numpy array:
+                # first of all there is a difference between x and y (x_length = x2 - x1, y_length = y2 - y1), they may be negative
+                # then is obtained the power of two of each coordinate length: x_length^2, y_length^2, no abs required thanks to it
+                # then they are added, for Pythagorean theorem: sum=(x_length^2)+(y_length^2)
+                # then the length is obtained with square root: sqrt( sum )
+                line_length = np.sqrt( np.sum( np.power( np.array(self.nodes[first_node].position) - np.array(self.nodes[second_node].position) , 2) ) )
+                self.lines[line_label] = Line(line_label, line_length) # each line is defined
+        self.connect()
     def route_space_update(self): # update route space analyzing the state of each line
         # it is required a probe in any case to have weighted path, by the way it is done in initialization
         if self.weighted_paths.empty:
