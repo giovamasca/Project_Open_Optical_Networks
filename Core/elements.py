@@ -331,28 +331,29 @@ class Network: # this is the most important class and define the network from th
         snr_or_latency = set_latency_or_snr if set_latency_or_snr else 'snr'
         use_state = use_state if use_state else False
         ################################
-        if self.traffic_matrix_full_filled():
-            return None # if there is no possible connection, return None
+        # if self.traffic_matrix_saturated():
+        #     return None # if there is no possible connection, return None
         nodes_gener = list(self.nodes.keys())  # extracts all nodes
         [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels
-        while (self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
+        while ( self.traffic_matrix[input_node][output_node]==0 ): # or self.traffic_matrix[input_node][output_node]==np.inf):
             [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
         connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection
         connection_generated = self.stream(connection=connection_generated, set_latency_or_snr=snr_or_latency, use_state=use_state)
         return connection_generated
-    def traffic_matrix_full_filled(self): # return a False state if in the matrix there are all 0 or inf values
+    def traffic_matrix_saturated(self): # return a True state if in the matrix there are all 0 or inf values
         # ############# DEBUG #############
         # for input_node in self.traffic_matrix:
         #     for output_node in self.traffic_matrix[input_node]:
-        #         self.traffic_matrix[input_node][output_node] == 0
+        #         if self.traffic_matrix[input_node][output_node] != 0:
+        #             self.traffic_matrix[input_node][output_node] == np.inf
         # #################################
-        full = True
+        saturated = True
         for input_node in self.traffic_matrix:
             for output_node in self.traffic_matrix[input_node]:
                 if (self.traffic_matrix[input_node][output_node] != 0 and self.traffic_matrix[input_node][output_node] != np.inf):
-                    full = False
-                    return full
-        return full
+                    saturated = False
+                    return saturated
+        return saturated
     def random_generation(self, nodes_gener):
         n1 = rnd.randint(0, len(nodes_gener) - 1)  # any position is ok
         n2 = rnd.randint(0, len(nodes_gener) - 1)
