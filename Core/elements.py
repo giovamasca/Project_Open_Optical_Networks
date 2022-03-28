@@ -56,7 +56,7 @@ class Lightpath( SignalInformation ): # inherited class from signal information
         # there is a channel attribute more than signal information class, by the way this attribute has constrains
         # if these constrains are not respected the code exits with an error state
         ####### LAB 8 attributes
-        self._Rs = None # symbol rate
+        self._Rs = None # symbol rate in GBaud/s
         self._df = None # channel spacing between two adjacent frequencies
     @property
     def channel(self): # channel is a private value, once defined could not be changed
@@ -329,7 +329,7 @@ class Network: # this is the most important class and define the network from th
     def connection_with_traffic_matrix(self, set_latency_or_snr=None, use_state=None):
         ####### inputs default #########
         snr_or_latency = set_latency_or_snr if set_latency_or_snr else 'snr'
-        use_state = use_state if use_state else False
+        use_state = use_state if use_state else True
         ################################
         # if self.traffic_matrix_saturated():
         #     return None # if there is no possible connection, return None
@@ -676,6 +676,7 @@ class Network: # this is the most important class and define the network from th
             Rb = self.calculate_bit_rate(lightpath=signal, strategy=self.nodes[path[0]].transceiver) # evaluate the bit rate of path with the transceiver condition of first node
             if Rb == 0: # if bit rate null let's avoid connection
                 remove_connection = True
+
         if remove_connection: # if at least one condition on bit rate and path is not respected, let's avoid it
             connection.latency = np.NaN # set Not-A-Number for all components, except for channel that is None
             connection.snr = np.NaN
@@ -683,7 +684,18 @@ class Network: # this is the most important class and define the network from th
             connection.bit_rate = np.NaN
             return connection
 
-        self.propagate(signal) # propagation of signal or lightpath
+        ###### Traffic Management
+        ## after remove condition because is updated only if the connection exists
+        input_node = path[0]
+        output_node = path[-1]
+        traffic_path = self.traffic_matrix[input_node][output_node]
+        if (traffic_path - Rb) <= 0:
+            self.traffic_matrix[input_node][output_node] = np.inf
+        else:
+            self.traffic_matrix[input_node][output_node] -= Rb
+
+        ##### Propagation after all condition
+        self.propagate(signal) # propagation of signal or lightpath only if not removed
 
         connection.latency = signal.latency # if signal.latency is not None else np.NaN
         connection.snr = linear_to_dB_conversion_power( signal.signal_power / signal.noise_power )
@@ -704,7 +716,9 @@ class Network: # this is the most important class and define the network from th
         GSNR_lin = dB_to_linear_conversion_power(GSNR_dB) # in linear value
 
         bit_rate = bit_rate_evaluation(GSNR_lin, strategy)
-        lightpath.Rs = bit_rate
+        if hasattr(lightpath, 'channel'): # only lightpath has these attributes
+            lightpath.Rs = bit_rate
+            lightpath.df = channel_spacing
         return bit_rate
 
 class Connection:  # class that define a connection between two nodes
