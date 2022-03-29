@@ -8,7 +8,7 @@ number_of_active_channels = 10 # if number of channels changes
 noise_power_spectral_density = 1e-9
 BER_target = 1e-3
 Bn_noise_band = 12.5e9 # Ghz noise bandwith
-### TX PARAMETERS
+### TX PARAMETERSgit
 Rs_symbol_rate = 32e9 # GHz symbol rate
 span_length = 80e3 # m, equal 80 km
 frequency_C_band = 193.414e12 # is the central frequency at C-band for optical communications, equivalent to 193.414 THz
