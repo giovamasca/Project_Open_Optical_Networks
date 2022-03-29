@@ -3,7 +3,7 @@ import random
 # matplotlib.use('TkAgg')
 # import time
 import matplotlib.pyplot as plt
-import os
+# import os
 
 import numpy as np
 
@@ -86,10 +86,43 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
 
-    # savefig_path = None ##### AVOIDED SAVE AS DEBUG
+    savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path:
-        if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
-            os.makedirs('../Results/Lab9')
+        # if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
+        #     os.makedirs('../Results/Lab9')
+        plt.savefig(savefig_path)
+
+    # fig.canvas.draw()
+    # plt.pause(0.25)
+    return
+def plot_bar(figure_num, list_data, x_ticks, edge_color='k', color=None, label='', title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
+    if NaN_display:
+        list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
+
+    x = np.arange(len(x_ticks))
+
+    fig = plt.figure(figure_num)
+    # fig, ax = plt.subplots()
+    ax = plt.gca()
+
+    fig.subplots_adjust(bottom=bottom)
+    plt.bar( x=x-0.25, width=0.25, height=list_data[0], edgecolor=edge_color, color = color, alpha=alpha)
+    plt.bar(x=x+0.0, width=0.25, height=list_data[1], edgecolor=edge_color, color=color, alpha=alpha)
+    plt.bar(x=x+0.25, width=0.25, height=list_data[2], edgecolor=edge_color, color=color, alpha=alpha)
+    plt.title(title)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+
+    ax.set_xticks(x, x_ticks)
+    ax.legend(labels=label, bbox_to_anchor = bbox_to_anchor, loc = loc)
+
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(8, 6)
+
+    savefig_path = None ##### AVOIDED SAVE AS DEBUG
+    if savefig_path: # if None avoid save
+        # if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
+        #     os.makedirs('../Results/Lab9')
         plt.savefig(savefig_path)
 
     # fig.canvas.draw()

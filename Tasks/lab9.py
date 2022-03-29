@@ -49,56 +49,92 @@ shannon_label = 'Shannon with average Rb=' + str(np.round(average_bit_rate_shann
 plot_histogram(figure_num = 3, list_data=[ connection_list_data_extractor(connections[fixed], 'Rb'),
                                            connection_list_data_extractor(connections[flex], 'Rb'),
                                            connection_list_data_extractor(connections[shannon], 'Rb') ],
-               nbins=40, edge_color='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label],
+               nbins=8, edge_color='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label],
                title = 'Point 6 Lab 9 - Histogram of Bit Rates per transceiver', bbox_to_anchor=(0.5, -0.35), loc='lower center',
                ylabel='number of results', bottom=0.25, xlabel='Bit rate [Gbps]', savefig_path = lab9_fig3)
-print()
+
 print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]))
 print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]))
 print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections[shannon]))
 # plt.draw() # has to be put at the end
 
-#################### Point 7
+#################### Point 7 ##############################à
 print('\n\t\t\tPoint 7 Lab 9\n')
 connections_fixed_per_M = []
+number_connections_fixed_rate_per_M = []
+number_blocking_events_fixed_rate_per_M = []
+capacities_fixed_rate_per_M = []
+average_bitrate_fixed_rate_per_M = []
+
 connections_flex_per_M = []
+number_connections_flex_rate_per_M = []
+number_blocking_events_flex_rate_per_M = []
+capacities_flex_rate_per_M = []
+average_bitrate_flex_rate_per_M = []
+
 connections_shannon_per_M = []
+number_connections_shannon_per_M = []
+number_blocking_events_shannon_per_M = []
+capacities_shannon_per_M = []
+average_bitrate_shannon_per_M = []
+
 M_list = []
 for M in range(1, 47, 9):
     M_list.append(M)
 
+    ################### FIXED RATE #####################
     print('\t\tFor M = ', str(M), ':')
     connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Fixed Rate')
-    print('\tTotal connections for fixed_rate network: ', len(connections_fixed_rate))
-    print('\tBlocking events for fixed_rate network: ', number_blocking_events_evaluation(connections_fixed_rate))
+    number_connections_fixed_rate = len(connections_fixed_rate)
+    number_blocking_events_fixed_rate = number_blocking_events_evaluation(connections_fixed_rate)
+    print('\tTotal connections for fixed_rate network: ', number_connections_fixed_rate)
+    print('\tBlocking events for fixed_rate network: ', number_blocking_events_fixed_rate)
     connections_fixed_per_M.append(connections_fixed_rate)
+    number_connections_fixed_rate_per_M.append(number_connections_fixed_rate)
+    number_blocking_events_fixed_rate_per_M.append(number_blocking_events_fixed_rate)
     ############## CAPACITY and BITRATE
     [capacity_fixed_rate, average_bit_rate_fixed_rate] = capacity_and_avarage(connections_list=connections_fixed_rate)
+    capacities_fixed_rate_per_M.append(capacity_fixed_rate)
+    average_bitrate_fixed_rate_per_M.append(average_bit_rate_fixed_rate)
     ## labels
     fixed_rate_label = 'Fixed Rate with average Rb=' + str(np.round(average_bit_rate_fixed_rate, 3)) + ' Gbps and C=' +\
                        str(np.round(capacity_fixed_rate * 1e-3, 3)) + ' Tbps'
     print('\t'+fixed_rate_label)
 
+    ################### FLEX RATE #######################à
     connections_flex_rate = random_generation_with_traffic_matrix(network=network_flex_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Flex Rate')
-    print('\tTotal connections for flex_rate network: ', len(connections_flex_rate))
-    print('\tBlocking events for flex_rate network: ', number_blocking_events_evaluation(connections_flex_rate))
+    number_connections_flex_rate = len(connections_flex_rate)
+    number_blocking_events_flex_rate = number_blocking_events_evaluation(connections_flex_rate)
+    print('\tTotal connections for flex_rate network: ', number_connections_flex_rate)
+    print('\tBlocking events for flex_rate network: ', number_blocking_events_flex_rate)
     connections_flex_per_M.append(connections_flex_rate)
+    number_connections_flex_rate_per_M.append(number_connections_flex_rate)
+    number_blocking_events_flex_rate_per_M.append(number_blocking_events_flex_rate)
     ############## CAPACITY and BITRATE
     [capacity_flex_rate, average_bit_rate_flex_rate] = capacity_and_avarage(connections_list=connections_flex_rate)
+    capacities_flex_rate_per_M.append(capacity_flex_rate)
+    average_bitrate_flex_rate_per_M.append(average_bit_rate_flex_rate)
     ## labels
     flex_rate_label = 'Flex Rate with average Rb=' + str(np.round(average_bit_rate_flex_rate, 3)) + ' Gbps and C=' + \
                        str(np.round(capacity_flex_rate * 1e-3, 3)) + ' Tbps'
     print('\t' + flex_rate_label)
 
+    ################### SHANNON RATE ########################
     connections_shannon = random_generation_with_traffic_matrix(network=network_shannon, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Shannon Rate')
-    print('\tTotal connections for shannon network: ', len(connections_shannon))
-    print('\tBlocking events for shannon network: ', number_blocking_events_evaluation(connections_shannon))
+    number_connections_shannon = len(connections_shannon)
+    number_blocking_events_shannon = number_blocking_events_evaluation(connections_shannon)
+    print('\tTotal connections for shannon network: ', number_connections_shannon)
+    print('\tBlocking events for shannon network: ', number_blocking_events_shannon)
     connections_shannon_per_M.append(connections_shannon)
+    number_connections_shannon_per_M.append(number_connections_shannon)
+    number_blocking_events_shannon_per_M.append(number_blocking_events_shannon)
     ############## CAPACITY and BITRATE
     [capacity_shannon, average_bit_rate_shannon] = capacity_and_avarage(connections_list=connections_shannon)
+    capacities_shannon_per_M.append(capacity_shannon)
+    average_bitrate_shannon_per_M.append(average_bit_rate_shannon)
     ## labels
     shannon_label = 'Fixed Rate with average Rb=' + str(np.round(average_bit_rate_shannon, 3)) + ' Gbps and C=' + \
                        str(np.round(capacity_shannon * 1e-3, 3)) + ' Tbps'
@@ -128,7 +164,7 @@ plot_histogram(figure_num=(8), list_data=[connection_list_data_extractor(connect
                xlabel='Rb [Gbps]', ylabel='number of results', title=('Point 7 Lab 9 - Flex Rate bitrate - with best '+set_latency_or_snr), alpha=0.75,
                savefig_path=lab9_fig8)
 plot_histogram(figure_num=(9), list_data=[connection_list_data_extractor(connection_list=connections_shannon_per_M[i], type_data='Rb') for i in range(0, len(M_list))],
-               nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
+               nbins=None, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Rb [Gbps]', ylabel='number of results', title=('Point 7 Lab 9 - Shannon Rate bitrate - with best '+set_latency_or_snr), alpha=0.75,
                savefig_path=lab9_fig9)
 ##################### LAT
@@ -144,6 +180,43 @@ plot_histogram(figure_num=(12), list_data=[np.array(connection_list_data_extract
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Latency [ms]', ylabel='number of results', title=('Point 7 Lab 9 - Shannon Rate latency - with best '+set_latency_or_snr), alpha=0.75,
                savefig_path=lab9_fig12)
-# plt.ioff()
+
+################ Number Connections
+plot_bar(figure_num=(13), list_data=[[number_connections_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [number_connections_flex_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [number_connections_shannon_per_M[i] for i in range(0, len(M_list))]],
+         x_ticks = [M for M in M_list], bbox_to_anchor=(0.5, -0.35), bottom=0.25, loc='lower center',
+         edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
+         xlabel='M value for traffic matrix', ylabel='number of connections',
+         title=('Point 7 Lab 9 - Number of connections - with best '+set_latency_or_snr), alpha=0.75,
+         savefig_path=None)
+################ Number Blocking Events
+plot_bar(figure_num=(14), list_data=[[number_blocking_events_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [number_blocking_events_flex_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [number_blocking_events_shannon_per_M[i] for i in range(0, len(M_list))]],
+         x_ticks = [M for M in M_list], bbox_to_anchor=(0.5, -0.35), bottom=0.25, loc='lower center',
+         edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
+         xlabel='M value for traffic matrix', ylabel='number of blocking events',
+         title=('Point 7 Lab 9 - Number of blocking events - with best '+set_latency_or_snr), alpha=0.75,
+         savefig_path=None)
+################ Capacity
+plot_bar(figure_num=(15), list_data=[[capacities_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [capacities_flex_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [capacities_shannon_per_M[i] for i in range(0, len(M_list))]],
+         x_ticks = [M for M in M_list], bbox_to_anchor=(0.5, -0.35), bottom=0.25, loc='lower center',
+         edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
+         xlabel='M value for traffic matrix', ylabel='Capacity [Gbps]',
+         title=('Point 7 Lab 9 - Capacity - with best '+set_latency_or_snr), alpha=0.75,
+         savefig_path=None)
+################ Average Bit Rate
+plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [average_bitrate_flex_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [average_bitrate_shannon_per_M[i] for i in range(0, len(M_list))]],
+         x_ticks = [M for M in M_list], bbox_to_anchor=(0.5, -0.35), bottom=0.25, loc='lower center',
+         edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
+         xlabel='M value for traffic matrix', ylabel='Average Bit Rate [Gbps]',
+         title=('Point 7 Lab 9 - Average Bit Rate - with best '+set_latency_or_snr), alpha=0.75,
+         savefig_path=None)
 # plt.pause(1)
+
 plt.show()
