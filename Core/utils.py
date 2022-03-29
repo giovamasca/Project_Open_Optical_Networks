@@ -1,7 +1,7 @@
 import random
 # import matplotlib
 # matplotlib.use('TkAgg')
-import time
+# import time
 import matplotlib.pyplot as plt
 import os
 
@@ -12,7 +12,8 @@ from Project_Open_Optical_Networks.Core.elements import Connection, Network
 def network_generation_from_file(network_file):
     network = Network(network_file)
     return network
-def random_generation_for_network(network, Numb_sim, network_label=None): # network and sumber of simulations
+def random_generation_for_network(network, Numb_sim, network_label=None, set_lat_or_snr=None): # network and sumber of simulations
+    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'snr' # default
     nodes_gener = list(network.nodes.keys())  # extracts all nodes
 
     # avarage_bit_rate = 0
@@ -24,7 +25,7 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
             n2 = random.randint(0, len(nodes_gener) - 1)  # repeat the random evaluation until there is a couple of nodes, not same values
 
         connection_generated = Connection(input_node=nodes_gener[n1], output_node=nodes_gener[n2], signal_power=1e-3)  # creates connection
-        connection_generated = network.stream(connection=connection_generated, set_latency_or_snr='snr', use_state=True)  # stream it with state on and snr set
+        connection_generated = network.stream(connection=connection_generated, set_latency_or_snr=set_lat_or_snr, use_state=True)  # stream it with state on and snr set
         # if connection_generated.latency==np.NaN:
         #     continue # avoid this connection
         # with np.NaN the histograms avoid the corresponding values
@@ -32,12 +33,13 @@ def random_generation_for_network(network, Numb_sim, network_label=None): # netw
         # avarage_bit_rate += connection_generated.bit_rate
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
-def random_generation_with_traffic_matrix(network, M_traffic=None):
+def random_generation_with_traffic_matrix(network, M_traffic=None, set_lat_or_snr=None):
+    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'snr'
     network.reset(M_traffic_matrix=M_traffic)
     connections = []
     # i=0
     while not network.traffic_matrix_saturated(): # generates a list until network is saturated
-        connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr='snr', use_state=True)
+        connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr=set_lat_or_snr, use_state=True)
         # input_node = connection_generated.input
         # output_node = connection_generated.output
         connections.append(connection_generated)
@@ -70,13 +72,13 @@ def connection_list_data_extractor(connection_list, type_data):
         exit(5)
     return list_data
 
-def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False):
+def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
     fig = plt.figure(figure_num)
     fig.subplots_adjust(bottom=bottom)
-    plt.hist( list_data, bins=nbins, edgecolor=edge_color, color = color, label = label)
+    plt.hist( list_data, bins=nbins, edgecolor=edge_color, color = color, label = label, alpha=alpha)
     plt.title(title)
     plt.legend(bbox_to_anchor = bbox_to_anchor, loc = loc)
     plt.ylabel(ylabel)
@@ -89,8 +91,7 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
         if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
             os.makedirs('../Results')
         plt.savefig(savefig_path)
-    # fig = plt.gcf()
-    fig.canvas.draw()
-    # plt.show(block=False)
-    plt.pause(0.25)
+
+    # fig.canvas.draw()
+    # plt.pause(0.25)
     return
