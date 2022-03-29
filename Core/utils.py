@@ -88,8 +88,8 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
 
     # savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path:
-        if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
-            os.makedirs('../Results')
+        if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
+            os.makedirs('../Results/Lab9')
         plt.savefig(savefig_path)
 
     # fig.canvas.draw()

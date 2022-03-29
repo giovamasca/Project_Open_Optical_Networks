@@ -1,4 +1,6 @@
 ########### GLOBAL VARIABLES ###########
+#### SET FIND BEST CONDITION at the beginning
+set_latency_or_snr = 'latency' # 'SNR' or 'latency' for find best
 ### CHANNELS
 number_of_active_channels = 10 # if number of channels changes
 # maximum_number_of_channels = 96 # this is the most diffused value for DeltaF of 50 GHz
@@ -42,9 +44,28 @@ file_nodes_full = root / 'Resources' / 'Lab_Networks' / 'nodes_full.json'
 file_nodes_not_full = root / 'Resources' / 'Lab_Networks' / 'nodes_not_full.json'
 
 ### Results saved
-lab8_fig1 = root / 'Results' / 'lab8_fig1_node_couples_full_and_not_full.png'
-lab8_fig2 = root / 'Results' / 'lab8_fig2_node_couples_transceiver.png'
-lab8_fig3 = root / 'Results' / 'lab8_fig3_SNR_full_and_not_full.png'
-lab8_fig4 = root / 'Results' / 'lab8_fig4_SNR_transceiver.png'
-lab8_fig5 = root / 'Results' / 'lab8_fig5_bit_rates.png'
+## LAB 8
+lab8_fig1 = root / 'Results' / 'Lab8' / 'lab8_fig1_node_couples_full_and_not_full.png'
+lab8_fig2 = root / 'Results' / 'Lab8' / 'lab8_fig2_node_couples_transceiver.png'
+lab8_fig3 = root / 'Results' / 'Lab8' / 'lab8_fig3_SNR_full_and_not_full.png'
+lab8_fig4 = root / 'Results' / 'Lab8' / 'lab8_fig4_SNR_transceiver.png'
+lab8_fig5 = root / 'Results' / 'Lab8' / 'lab8_fig5_bit_rates.png'
+## LAB 9
+# point 5
+lab9_fig1 = root / 'Results' / 'Lab9' / ('lab9_fig1_point5_IO_best_' + set_latency_or_snr)
+lab9_fig2 = root / 'Results' / 'Lab9' / ('lab9_fig2_point5_SNR_best_' + set_latency_or_snr)
+lab9_fig3 = root / 'Results' / 'Lab9' / ('lab9_fig3_point5_Rb_best_' + set_latency_or_snr)
+# point 7
+# SNR
+lab9_fig4 = root / 'Results' / 'Lab9' / ('lab9_fig4_point7_SNR_fixed_best_' + set_latency_or_snr)
+lab9_fig5 = root / 'Results' / 'Lab9' / ('lab9_fig5_point7_SNR_flex_best_' + set_latency_or_snr)
+lab9_fig6 = root / 'Results' / 'Lab9' / ('lab9_fig6_point7_SNR_shannon_best_' + set_latency_or_snr)
+# BITRATE
+lab9_fig7 = root / 'Results' / 'Lab9' / ('lab9_fig7_point7_Rb_fixed_best_' + set_latency_or_snr)
+lab9_fig8 = root / 'Results' / 'Lab9' / ('lab9_fig8_point7_Rb_flex_best_' + set_latency_or_snr)
+lab9_fig9 = root / 'Results' / 'Lab9' / ('lab9_fig9_point7_Rb_shannon_best_' + set_latency_or_snr)
+# LAT
+lab9_fig10 = root / 'Results' / 'Lab9' / ('lab9_fig10_point7_latency_fixed_best_' + set_latency_or_snr)
+lab9_fig11 = root / 'Results' / 'Lab9' / ('lab9_fig11_point7_latency_flex_best_' + set_latency_or_snr)
+lab9_fig12 = root / 'Results' / 'Lab9' / ('lab9_fig12_point7_latency_shannon_best_' + set_latency_or_snr)
 ##############################################################################################
