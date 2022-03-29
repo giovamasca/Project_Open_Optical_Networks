@@ -4,7 +4,7 @@ from Project_Open_Optical_Networks.Core.utils import *
 from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarage_bit_rate as capacity_and_avarage
 
 #### SET FIND BEST CONDITION at the beginning
-set_latency_or_snr = 'snr' # 'snr' or 'latency'
+set_latency_or_snr = 'SNR' # 'SNR' or 'latency'
 
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance

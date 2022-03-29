@@ -13,7 +13,7 @@ def network_generation_from_file(network_file):
     network = Network(network_file)
     return network
 def random_generation_for_network(network, Numb_sim, network_label=None, set_lat_or_snr=None): # network and sumber of simulations
-    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'snr' # default
+    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'SNR' # default
     nodes_gener = list(network.nodes.keys())  # extracts all nodes
 
     # avarage_bit_rate = 0
@@ -34,7 +34,7 @@ def random_generation_for_network(network, Numb_sim, network_label=None, set_lat
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
 def random_generation_with_traffic_matrix(network, M_traffic=None, set_lat_or_snr=None):
-    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'snr'
+    set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'SNR'
     network.reset(M_traffic_matrix=M_traffic)
     connections = []
     # i=0

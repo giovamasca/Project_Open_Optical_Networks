@@ -243,7 +243,7 @@ class Network: # this is the most important class and define the network from th
         self._nodes = {} # dictionary of nodes of network
         self._lines = {} # dictionary of lines of networks
         # then there are the dataframes for latency/snr (weighted paths) and state per channel (route space)
-        self._weighted_paths = pd.DataFrame(columns=['path', 'latency', 'noise', 'snr'])
+        self._weighted_paths = pd.DataFrame(columns=['path', 'latency', 'noise', 'SNR'])
         self._route_space = pd.DataFrame(columns=['path', 'availability_per_ch'])
         self._file_name = json_file # to restore switching matrix
 
@@ -334,7 +334,7 @@ class Network: # this is the most important class and define the network from th
         # print(self.traffic_matrix)
     def connection_with_traffic_matrix(self, set_latency_or_snr=None, use_state=None):
         ####### inputs default #########
-        snr_or_latency = set_latency_or_snr if set_latency_or_snr else 'snr'
+        snr_or_latency = set_latency_or_snr if set_latency_or_snr else 'SNR'
         use_state = use_state if use_state else True
         ################################
         # if self.traffic_matrix_saturated():
@@ -590,7 +590,7 @@ class Network: # this is the most important class and define the network from th
         # define dataframe of interest
         self.weighted_paths['path'] = titles
         self.weighted_paths['latency'] = latencies
-        self.weighted_paths['snr'] = snrs
+        self.weighted_paths['SNR'] = snrs
         self.weighted_paths['noise'] = noises
 
         # once done it shouldn't be repeated if the network is the same
@@ -604,7 +604,7 @@ class Network: # this is the most important class and define the network from th
         # self.route_space_update()
 
         # define snr dataframe
-        best_dataframe = pd.DataFrame(columns=['path', 'snr', 'number_channels_available'])
+        best_dataframe = pd.DataFrame(columns=['path', 'SNR', 'number_channels_available'])
 
         # create lists for dataframe
         paths = []
@@ -632,22 +632,22 @@ class Network: # this is the most important class and define the network from th
                     channels = np.array([i for i in range(0, number_of_active_channels) if states_path[i] == FREE]) # extracts positions [numbers that could be from 0 to max ch]
                     if len(channels)>0: # if there are available channels it appends in list the results for dataframe
                         paths.append(path_label)
-                        snrs.append(self.weighted_paths['snr'].loc[self.weighted_paths['path']==path_label].item()) # needed snr fot the corresponding path
+                        snrs.append(self.weighted_paths['SNR'].loc[self.weighted_paths['path']==path_label].item()) # needed snr fot the corresponding path
                         latencies.append(self.weighted_paths['latency'].loc[self.weighted_paths['path'] == path_label].item())  # needed latency for the corresponding path
                         number_channels_available.append(channels)
         if len(paths)==0: # if there is not any path available, return none
             self.traffic_matrix[first_node][last_node] = np.inf ## to avoid infinite loop for traffic matrix saturation
-            return {'snr': {'path':None, 'channels':None}, 'latency': {'path':None, 'channels':None}} # there is not any available path for all possible channels
+            return {'SNR': {'path':None, 'channels':None}, 'latency': {'path':None, 'channels':None}} # there is not any available path for all possible channels
 
         # dataframe filling
         best_dataframe['path'] = paths
-        best_dataframe['snr'] = snrs
+        best_dataframe['SNR'] = snrs
         best_dataframe['latency'] = latencies
         best_dataframe['number_channels_available'] = number_channels_available
 
         #### Find MAX SNR
-        #max_snr = snr_dataframe['snr'].max() # this was the maximum value, but is useless
-        idx_max = best_dataframe['snr'].idxmax() # find maximum snr index
+        #max_snr = snr_dataframe['SNR'].max() # this was the maximum value, but is useless
+        idx_max = best_dataframe['SNR'].idxmax() # find maximum snr index
         #### FIND MIN LATENCY
         # min_latency = latency_dataframe['latency'].min() # this was the minimum value, but is useless
         idx_min = best_dataframe['latency'].idxmin()  # find minimum latency index
@@ -660,17 +660,17 @@ class Network: # this is the most important class and define the network from th
 
         best_snr = {'path': path_best_snr, 'channels': channel_availability_snr} # creates a dictionary that will be returned
         best_latency = {'path': path_best_latency, 'channels': channel_availability_latency}  # creates a dictionary that will be returned
-        best = {'latency': best_latency, 'snr': best_snr}
+        best = {'latency': best_latency, 'SNR': best_snr}
         return best
 
     def stream(self, connection, set_latency_or_snr=None, use_state=None): # this function streams a conncetion with specific set
         use_state = use_state if use_state else False # if we want to use the state of the connections, let's put use_state=True
         #connection = Connection(input_node, output_node, signal_power)
-        set_lat_snr = set_latency_or_snr if set_latency_or_snr else 'snr' # select which set we want to use, if not defined is 'latency'
+        set_lat_snr = set_latency_or_snr if set_latency_or_snr else 'SNR' # select which set we want to use, if not defined is 'latency'
         remove_connection = False # if some conditions are not satisfied let's avoid propagation
         Rb = 0 # initialized Rb
 
-        if set_lat_snr != 'latency' and set_lat_snr!='snr': # THEY USE STATE
+        if set_lat_snr != 'latency' and set_lat_snr!='SNR': # THEY USE STATE
             print('ERROR! Set for stream function in class Network avoided.') # if the setter is wrongly defined, it gives an error and exit
             exit(3)
 
@@ -731,7 +731,7 @@ class Network: # this is the most important class and define the network from th
         path_label = path_label[:-2]
 
         # let's find the corresponding SNR for path label at input and obtain it as a floating number
-        GSNR_dB = self.weighted_paths['snr'].loc[self.weighted_paths['path'] == path_label].item()
+        GSNR_dB = self.weighted_paths['SNR'].loc[self.weighted_paths['path'] == path_label].item()
         GSNR_lin = dB_to_linear_conversion_power(GSNR_dB) # in linear value
 
         bit_rate = bit_rate_evaluation(GSNR_lin, strategy)

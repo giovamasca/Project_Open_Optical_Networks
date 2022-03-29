@@ -1,7 +1,7 @@
 ########### GLOBAL VARIABLES ###########
 ### CHANNELS
 number_of_active_channels = 10 # if number of channels changes
-maximum_number_of_channels = 96 # this is the most diffused value for DeltaF of 50 GHz
+# maximum_number_of_channels = 96 # this is the most diffused value for DeltaF of 50 GHz
 ### NOISE, BER PARAMETERS
 noise_power_spectral_density = 1e-9
 BER_target = 1e-3
