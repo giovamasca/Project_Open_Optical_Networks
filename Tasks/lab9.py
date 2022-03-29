@@ -3,9 +3,6 @@ from Project_Open_Optical_Networks.Core.utils import *
 
 from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarage_bit_rate as capacity_and_avarage
 
-#### SET FIND BEST CONDITION at the beginning
-set_latency_or_snr = 'SNR' # 'SNR' or 'latency'
-
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance
 network_fixed_rate = network_generation_from_file(file_nodes_full_fixed_rate)
@@ -17,7 +14,7 @@ fixed = 'fixed_rate'
 flex = 'flex_rate'
 shannon = 'shannon'
 
-print('\t\t\tPoint 6 - Lab 9\n')
+print('\t\t\tPoint 5 - Lab 9\n')
 ### Connections list
 connections = {fixed:[], flex:[], shannon:[]}
 connections[fixed] = random_generation_for_network(network=network_fixed_rate, Numb_sim=Number_simulations, network_label=fixed, set_lat_or_snr=set_latency_or_snr)
@@ -30,14 +27,14 @@ plot_histogram(figure_num=1, list_data=[connection_list_data_extractor(connectio
                                         connection_list_data_extractor(connection_list=connections[shannon], type_data='I/O')],
                nbins=np.arange(31)-0.5, edge_color='k', color=['b', 'g', 'y'], label=[fixed, flex, shannon],
                title='Point 6 Lab 9 - Histogram of pairs of random extracted nodes for lightpath',
-               ylabel='number of results', xlabel='pair of nodes', savefig_path=None )
+               ylabel='number of results', xlabel='pair of nodes', savefig_path=lab9_fig1 )
 ############# FIGURE 2
 plot_histogram(figure_num=2, list_data=[connection_list_data_extractor(connection_list=connections[fixed], type_data='SNR'),
                                         connection_list_data_extractor(connection_list=connections[flex], type_data='SNR'),
                                         connection_list_data_extractor(connection_list=connections[shannon], type_data='SNR')],
                nbins=20, edge_color='k', color=['g', 'm', 'y'], label=[fixed, flex, shannon],
                title='Point 6 Lab 9 - Histogram of SNR for each type of tranceiver',
-               ylabel='number of results', xlabel='SNR [dB]', savefig_path=None)
+               ylabel='number of results', xlabel='SNR [dB]', savefig_path=lab9_fig2)
 
 ########## BIT RATE and CAPACITY
 [capacity_fixed_rate, average_bit_rate_fixed_rate] = capacity_and_avarage(connections_list=connections[fixed])
@@ -54,7 +51,7 @@ plot_histogram(figure_num = 3, list_data=[ connection_list_data_extractor(connec
                                            connection_list_data_extractor(connections[shannon], 'Rb') ],
                nbins=40, edge_color='k', color=['y', 'm', 'r'], label=[fixed_rate_label, flex_rate_label, shannon_label],
                title = 'Point 6 Lab 9 - Histogram of Bit Rates per transceiver', bbox_to_anchor=(0.5, -0.35), loc='lower center',
-               ylabel='number of results', bottom=0.25, xlabel='Bit rate [Gbps]', savefig_path = None)
+               ylabel='number of results', bottom=0.25, xlabel='Bit rate [Gbps]', savefig_path = lab9_fig3)
 print()
 print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]))
 print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]))
@@ -112,41 +109,41 @@ for M in range(1, 47, 9):
 plot_histogram(figure_num=(4), list_data=[connection_list_data_extractor(connection_list=connections_fixed_per_M[i], type_data='SNR') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='SNR [dB]', ylabel='number of results', title=('Point 7 Lab 9 - Fixed Rate SNR - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig4)
 plot_histogram(figure_num=(5), list_data=[connection_list_data_extractor(connection_list=connections_flex_per_M[i], type_data='SNR') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='SNR [dB]', ylabel='number of results', title=('Point 7 Lab 9 - Flex Rate SNR - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig5)
 plot_histogram(figure_num=(6), list_data=[connection_list_data_extractor(connection_list=connections_shannon_per_M[i], type_data='SNR') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='SNR [dB]', ylabel='number of results', title=('Point 7 Lab 9 - Shannon Rate SNR - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig6)
 ##################### BITRATE
 plot_histogram(figure_num=(7), list_data=[connection_list_data_extractor(connection_list=connections_fixed_per_M[i], type_data='Rb') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Rb [Gbps]', ylabel='number of results', title=('Point 7 Lab 9 - Fixed Rate bitrate - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig7)
 plot_histogram(figure_num=(8), list_data=[connection_list_data_extractor(connection_list=connections_flex_per_M[i], type_data='Rb') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Rb [Gbps]', ylabel='number of results', title=('Point 7 Lab 9 - Flex Rate bitrate - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig8)
 plot_histogram(figure_num=(9), list_data=[connection_list_data_extractor(connection_list=connections_shannon_per_M[i], type_data='Rb') for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Rb [Gbps]', ylabel='number of results', title=('Point 7 Lab 9 - Shannon Rate bitrate - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig9)
 ##################### LAT
 plot_histogram(figure_num=(10), list_data=[np.array(connection_list_data_extractor(connection_list=connections_fixed_per_M[i], type_data='LAT'))*1e3 for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Latency [ms]', ylabel='number of results', title=('Point 7 Lab 9 - Fixed Rate latency - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig10)
 plot_histogram(figure_num=(11), list_data=[np.array(connection_list_data_extractor(connection_list=connections_flex_per_M[i], type_data='LAT'))*1e3 for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Latency [ms]', ylabel='number of results', title=('Point 7 Lab 9 - Flex Rate latency - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig11)
 plot_histogram(figure_num=(12), list_data=[np.array(connection_list_data_extractor(connection_list=connections_shannon_per_M[i], type_data='LAT'))*1e3 for i in range(0, len(M_list))],
                nbins=8, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
                xlabel='Latency [ms]', ylabel='number of results', title=('Point 7 Lab 9 - Shannon Rate latency - with best '+set_latency_or_snr), alpha=0.75,
-               savefig_path=None)
+               savefig_path=lab9_fig12)
 # plt.ioff()
 # plt.pause(1)
 plt.show()

@@ -1,4 +1,5 @@
-./Results
+# Avoided upload folder of Results
+Results
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
