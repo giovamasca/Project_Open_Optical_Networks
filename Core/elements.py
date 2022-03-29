@@ -716,9 +716,6 @@ class Network: # this is the most important class and define the network from th
         ##### Propagation after all condition
         self.propagate(signal) # propagation of signal or lightpath only if not removed
 
-        # if self.find_best(first_node=input_node, last_node=output_node)['snr']['path'] == None: # to avoid infinite loop, after propagation if channels are all occupied, return inf in traffic matrix
-        #     self.traffic_matrix[input_node][output_node] = np.inf
-
         connection.latency = signal.latency # if signal.latency is not None else np.NaN
         connection.snr = linear_to_dB_conversion_power( signal.signal_power / signal.noise_power )
         connection.channel = channel # set channel

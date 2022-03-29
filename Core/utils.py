@@ -1,4 +1,7 @@
 import random
+# import matplotlib
+# matplotlib.use('TkAgg')
+import time
 import matplotlib.pyplot as plt
 import os
 
@@ -34,7 +37,10 @@ def random_generation_with_traffic_matrix(network, M_traffic=None):
     connections = []
     # i=0
     while not network.traffic_matrix_saturated(): # generates a list until network is saturated
-        connections.append(network.connection_with_traffic_matrix(set_latency_or_snr='snr', use_state=True))
+        connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr='snr', use_state=True)
+        # input_node = connection_generated.input
+        # output_node = connection_generated.output
+        connections.append(connection_generated)
         # i += 1
         # print(i)
     return connections
@@ -80,4 +86,6 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
         if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
             os.makedirs('../Results')
         plt.savefig(savefig_path)
-    # plt.show()
+    # plt.ion()
+    fig.canvas.draw()
+    return

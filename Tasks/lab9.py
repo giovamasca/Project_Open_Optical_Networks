@@ -39,9 +39,9 @@ from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarag
 [capacity_flex_rate, avarage_bit_rate_flex_rate] = capacity_and_avarage(connections_list=connections[flex])
 [capacity_shannon, avarage_bit_rate_shannon] = capacity_and_avarage(connections_list=connections[shannon])
 ## labels
-fixed_rate_label = 'Fixed Rate with avarage Rb=' + str(np.round(avarage_bit_rate_fixed_rate*1e-9, 3)) + ' Gbps and C=' + str(np.round(capacity_fixed_rate*1e-12, 3)) + ' Tbps'
-flex_rate_label = 'Flex Rate with avarage Rb=' + str(np.round(avarage_bit_rate_flex_rate*1e-9, 3)) + ' Gbps and C=' + str(np.round(capacity_flex_rate*1e-12, 3)) + ' Tbps'
-shannon_label = 'Shannon with avarage Rb=' + str(np.round(avarage_bit_rate_shannon*1e-9, 3)) + ' Gbps and C=' + str(np.round(capacity_shannon*1e-12, 3)) + ' Tbps'
+fixed_rate_label = 'Fixed Rate with avarage Rb=' + str(np.round(avarage_bit_rate_fixed_rate*1, 3)) + ' Gbps and C=' + str(np.round(capacity_fixed_rate*1e-3, 3)) + ' Tbps'
+flex_rate_label = 'Flex Rate with avarage Rb=' + str(np.round(avarage_bit_rate_flex_rate*1, 3)) + ' Gbps and C=' + str(np.round(capacity_flex_rate*1e-3, 3)) + ' Tbps'
+shannon_label = 'Shannon with avarage Rb=' + str(np.round(avarage_bit_rate_shannon*1, 3)) + ' Gbps and C=' + str(np.round(capacity_shannon*1e-3, 3)) + ' Tbps'
 
 ################## FIGURE 3
 plot_histogram(figure_num = 3, list_data=[ connection_list_data_extractor(connections[fixed], 'Rb'),
@@ -54,13 +54,13 @@ print()
 print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]))
 print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]))
 print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections[shannon]))
-plt.draw() # has to be put at the end
+# plt.draw() # has to be put at the end
 
 #################### Point 7
 connections_fixed_per_M = []
 connections_flex_per_M = []
 connections_shannon_per_M = []
-for M in range(1, 10):
+for M in range(1, 37, 7):
     print('\tFor M = ', str(M), ':')
     connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M)
     print('Total connections for fixed_rate network: ', len(connections_fixed_rate))
