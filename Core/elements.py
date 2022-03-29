@@ -328,9 +328,9 @@ class Network: # this is the most important class and define the network from th
         for node_i in self.traffic_matrix:
             for node_j in self.nodes:
                 if node_i == node_j:
-                    self.traffic_matrix[node_i][node_j] = 0
+                    self.traffic_matrix[node_i][node_j] = float(0)
                 else:
-                    self.traffic_matrix[node_i][node_j] = 100*M # Gbps
+                    self.traffic_matrix[node_i][node_j] = float(100*M) # Gbps
         # print(self.traffic_matrix)
     def connection_with_traffic_matrix(self, set_latency_or_snr=None, use_state=None):
         ####### inputs default #########
@@ -636,6 +636,7 @@ class Network: # this is the most important class and define the network from th
                         latencies.append(self.weighted_paths['latency'].loc[self.weighted_paths['path'] == path_label].item())  # needed latency for the corresponding path
                         number_channels_available.append(channels)
         if len(paths)==0: # if there is not any path available, return none
+            self.traffic_matrix[first_node][last_node] = np.inf ## to avoid infinite loop for traffic matrix saturation
             return {'snr': {'path':None, 'channels':None}, 'latency': {'path':None, 'channels':None}} # there is not any available path for all possible channels
 
         # dataframe filling
@@ -714,6 +715,9 @@ class Network: # this is the most important class and define the network from th
 
         ##### Propagation after all condition
         self.propagate(signal) # propagation of signal or lightpath only if not removed
+
+        # if self.find_best(first_node=input_node, last_node=output_node)['snr']['path'] == None: # to avoid infinite loop, after propagation if channels are all occupied, return inf in traffic matrix
+        #     self.traffic_matrix[input_node][output_node] = np.inf
 
         connection.latency = signal.latency # if signal.latency is not None else np.NaN
         connection.snr = linear_to_dB_conversion_power( signal.signal_power / signal.noise_power )
