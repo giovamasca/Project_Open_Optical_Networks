@@ -57,10 +57,13 @@ print('Blocking events for shannon network: ', number_blocking_events_evaluation
 # plt.draw() # has to be put at the end
 
 #################### Point 7
-connections_fixed_per_M = []
-connections_flex_per_M = []
-connections_shannon_per_M = []
+print('\nPoint 7 Lab 9')
+# connections_fixed_per_M = []
+# connections_flex_per_M = []
+# connections_shannon_per_M = []
+fig_num = 0
 for M in range(1, 37, 7):
+    fig_num += 1
     print('\tFor M = ', str(M), ':')
     connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M)
     print('Total connections for fixed_rate network: ', len(connections_fixed_rate))
@@ -72,4 +75,10 @@ for M in range(1, 37, 7):
     print('Total connections for shannon network: ', len(connections_shannon))
     print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections_shannon))
 
+    # plt.ion()
+    plot_histogram(figure_num=(3+fig_num), list_data=connection_list_data_extractor(connection_list=connections_fixed_rate, type_data='SNR'),
+                   nbins=20, edge_color='k', color='y', label='fixed rate', xlabel='SNR [dB]', ylabel='number of results',
+                   title=('Point 7 Lab 9 - M='+str(M)), savefig_path=None)
+    # plt.ioff()
+    # plt.pause(1)
 plt.show()

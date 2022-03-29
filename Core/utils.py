@@ -65,6 +65,9 @@ def connection_list_data_extractor(connection_list, type_data):
         list_data = [connection.latency for connection in connection_list]
     elif type_data == 'Rb':
         list_data = [connection.bit_rate for connection in connection_list]
+    else:
+        print('Error in type_data for connection list extractor!')
+        exit(5)
     return list_data
 
 def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False):
@@ -86,6 +89,8 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
         if not os.path.isdir('../Results'): # if Results doesn't exists, it creates it
             os.makedirs('../Results')
         plt.savefig(savefig_path)
-    # plt.ion()
+    # fig = plt.gcf()
     fig.canvas.draw()
+    # plt.show(block=False)
+    plt.pause(0.25)
     return
