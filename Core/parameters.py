@@ -48,8 +48,10 @@ file_nodes_not_full = root / 'Resources' / 'Lab_Networks' / 'nodes_not_full.json
 
 ### Results saved
 trial_path = 'best_' + set_latency_or_snr + '_of_' + time.strftime('%Y_%m_%d__%H_%M_%S')
-# if not os.path.isdir('../Results/Lab9/' + trial_path):  # if Results doesn't exists, it creates it
-    # os.makedirs('../Results/Lab9/' + trial_path)
+if not os.path.isdir('../Results/Lab9/' + trial_path):  # if Results doesn't exists, it creates it
+    os.makedirs('../Results/Lab9/' + trial_path)
+
+file_console = root / 'Results' / 'Lab9' / trial_path / 'console.txt'
 ## LAB 8
 lab8_fig1 = root / 'Results' / 'Lab8' / 'lab8_fig1_node_couples_full_and_not_full.png'
 lab8_fig2 = root / 'Results' / 'Lab8' / 'lab8_fig2_node_couples_transceiver.png'

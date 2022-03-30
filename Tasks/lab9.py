@@ -14,13 +14,15 @@ fixed = 'fixed_rate'
 flex = 'flex_rate'
 shannon = 'shannon'
 
+file_print = open(file_console, 'w')
 print('\t\t\tPoint 5 - Lab 9\n')
+print('\t\t\tPoint 5 - Lab 9\n', file=file_print)
 ### Connections list
 connections = {fixed:[], flex:[], shannon:[]}
 connections[fixed] = random_generation_for_network(network=network_fixed_rate, Numb_sim=Number_simulations, network_label=fixed, set_lat_or_snr=set_latency_or_snr)
 connections[flex] = random_generation_for_network(network=network_flex_rate, Numb_sim=Number_simulations, network_label=flex, set_lat_or_snr=set_latency_or_snr)
 connections[shannon] = random_generation_for_network(network=network_shannon, Numb_sim=Number_simulations, network_label=shannon, set_lat_or_snr=set_latency_or_snr)
-
+print()
 ############# FIGURE 1
 plot_histogram(figure_num=1, list_data=[connection_list_data_extractor(connection_list=connections[fixed], type_data='I/O'),
                                         connection_list_data_extractor(connection_list=connections[flex], type_data='I/O'),
@@ -56,10 +58,14 @@ plot_histogram(figure_num = 3, list_data=[ connection_list_data_extractor(connec
 print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]))
 print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]))
 print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections[shannon]))
+print('Blocking events for fixed_rate network: ', number_blocking_events_evaluation(connections[fixed]), file=file_print)
+print('Blocking events for flex_rate network: ', number_blocking_events_evaluation(connections[flex]), file=file_print)
+print('Blocking events for shannon network: ', number_blocking_events_evaluation(connections[shannon]), file=file_print)
 # plt.draw() # has to be put at the end
 
 #################### Point 7 ##############################à
 print('\n\t\t\tPoint 7 Lab 9\n')
+print('\n\t\t\tPoint 7 Lab 9\n', file=file_print)
 connections_fixed_per_M = []
 number_connections_fixed_rate_per_M = []
 number_blocking_events_fixed_rate_per_M = []
@@ -79,17 +85,21 @@ capacities_shannon_per_M = []
 average_bitrate_shannon_per_M = []
 
 M_list = []
-for M in range(1, 47, 9):
+for M in [1, 5, 15, 25, 35, 45, 55]: # [1, 10, 25, 45, 60] # range(1, 47, 9)
     M_list.append(M)
 
     ################### FIXED RATE #####################
     print('\t\tFor M = ', str(M), ':')
+    print('\t\tFor M = ', str(M), ':', file=file_print)
     connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Fixed Rate')
+    print('Fixed Rate', file=file_print)
     number_connections_fixed_rate = len(connections_fixed_rate)
     number_blocking_events_fixed_rate = number_blocking_events_evaluation(connections_fixed_rate)
     print('\tTotal connections for fixed_rate network: ', number_connections_fixed_rate)
     print('\tBlocking events for fixed_rate network: ', number_blocking_events_fixed_rate)
+    print('\tTotal connections for fixed_rate network: ', number_connections_fixed_rate, file=file_print)
+    print('\tBlocking events for fixed_rate network: ', number_blocking_events_fixed_rate, file=file_print)
     connections_fixed_per_M.append(connections_fixed_rate)
     number_connections_fixed_rate_per_M.append(number_connections_fixed_rate)
     number_blocking_events_fixed_rate_per_M.append(number_blocking_events_fixed_rate)
@@ -101,14 +111,18 @@ for M in range(1, 47, 9):
     fixed_rate_label = 'Fixed Rate with average Rb=' + str(np.round(average_bit_rate_fixed_rate, 3)) + ' Gbps and C=' +\
                        str(np.round(capacity_fixed_rate * 1e-3, 3)) + ' Tbps'
     print('\t'+fixed_rate_label)
+    print('\t' + fixed_rate_label, file=file_print)
 
     ################### FLEX RATE #######################à
     connections_flex_rate = random_generation_with_traffic_matrix(network=network_flex_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Flex Rate')
+    print('Flex Rate', file=file_print)
     number_connections_flex_rate = len(connections_flex_rate)
     number_blocking_events_flex_rate = number_blocking_events_evaluation(connections_flex_rate)
     print('\tTotal connections for flex_rate network: ', number_connections_flex_rate)
     print('\tBlocking events for flex_rate network: ', number_blocking_events_flex_rate)
+    print('\tTotal connections for flex_rate network: ', number_connections_flex_rate, file=file_print)
+    print('\tBlocking events for flex_rate network: ', number_blocking_events_flex_rate, file=file_print)
     connections_flex_per_M.append(connections_flex_rate)
     number_connections_flex_rate_per_M.append(number_connections_flex_rate)
     number_blocking_events_flex_rate_per_M.append(number_blocking_events_flex_rate)
@@ -120,14 +134,18 @@ for M in range(1, 47, 9):
     flex_rate_label = 'Flex Rate with average Rb=' + str(np.round(average_bit_rate_flex_rate, 3)) + ' Gbps and C=' + \
                        str(np.round(capacity_flex_rate * 1e-3, 3)) + ' Tbps'
     print('\t' + flex_rate_label)
+    print('\t' + flex_rate_label, file=file_print)
 
     ################### SHANNON RATE ########################
     connections_shannon = random_generation_with_traffic_matrix(network=network_shannon, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Shannon Rate')
+    print('Shannon Rate', file=file_print)
     number_connections_shannon = len(connections_shannon)
     number_blocking_events_shannon = number_blocking_events_evaluation(connections_shannon)
     print('\tTotal connections for shannon network: ', number_connections_shannon)
     print('\tBlocking events for shannon network: ', number_blocking_events_shannon)
+    print('\tTotal connections for shannon network: ', number_connections_shannon, file=file_print)
+    print('\tBlocking events for shannon network: ', number_blocking_events_shannon, file=file_print)
     connections_shannon_per_M.append(connections_shannon)
     number_connections_shannon_per_M.append(number_connections_shannon)
     number_blocking_events_shannon_per_M.append(number_blocking_events_shannon)
@@ -136,10 +154,12 @@ for M in range(1, 47, 9):
     capacities_shannon_per_M.append(capacity_shannon)
     average_bitrate_shannon_per_M.append(average_bit_rate_shannon)
     ## labels
-    shannon_label = 'Fixed Rate with average Rb=' + str(np.round(average_bit_rate_shannon, 3)) + ' Gbps and C=' + \
+    shannon_label = 'Shannon Rate with average Rb=' + str(np.round(average_bit_rate_shannon, 3)) + ' Gbps and C=' + \
                        str(np.round(capacity_shannon * 1e-3, 3)) + ' Tbps'
-    print('\t' + fixed_rate_label)
+    print('\t' + shannon_label)
     print()
+    print('\t' + shannon_label, file=file_print)
+    print(file=file_print)
 
 #################### SNR
 plot_histogram(figure_num=(4), list_data=[connection_list_data_extractor(connection_list=connections_fixed_per_M[i], type_data='SNR') for i in range(0, len(M_list))],
@@ -219,4 +239,5 @@ plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i 
          savefig_path=None)
 # plt.pause(1)
 
+file_print.close()
 plt.show()
