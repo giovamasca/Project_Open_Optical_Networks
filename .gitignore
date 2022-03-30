@@ -1,5 +1,6 @@
 # Avoided upload folder of Results
-Results
+Results/Lab8
+Results/Lab9
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

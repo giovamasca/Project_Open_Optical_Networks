@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 from Project_Open_Optical_Networks.Core.parameters import *
 from Project_Open_Optical_Networks.Core.utils import *
 
@@ -237,7 +239,9 @@ plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i 
          xlabel='M value for traffic matrix', ylabel='Average Bit Rate [Gbps]',
          title=('Point 7 Lab 9 - Average Bit Rate - with best '+set_latency_or_snr), alpha=0.75,
          savefig_path=lab9_fig16)
-# plt.pause(1)
+
+plt.figure(18)
+network_fixed_rate.draw()
 
 file_print.close()
 plt.show()

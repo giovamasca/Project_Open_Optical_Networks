@@ -540,11 +540,19 @@ class Network: # this is the most important class and define the network from th
                 x_connected_node = self.nodes[connected_node].position[0] # x extracts coordinations of connected nodes
                 y_connected_node = self.nodes[connected_node].position[1] # y extracts coordinations of connected nodes
 
-                plt.plot( [x_node, x_connected_node], [y_node, y_connected_node], 'y', linewidth=1.5 ) # plot the line between nodes
+                plt.plot( [x_node, x_connected_node], [y_node, y_connected_node], 'g', linewidth=1.5 ) # plot the line between nodes
 
         plt.plot(x_points, y_points, 'ob', markersize=8) # then after is plot the marker of nodes, so they will be up the lines
         for i in range(0, len(x_points)): # repeat for each node
-            plt.text( x_points[i]-25000, y_points[i]+5000, node_text[i] ) # remain the text of each node label
+            plt.text( x_points[i]+25000, y_points[i]-2500, node_text[i] ) # remain the text of each node label
+        plt.title('Giovanni Mascarino - 269725\nNetwork for Exam Open Optical Network')
+        plt.grid()
+        plt.axis('equal')
+        plt.xlabel('node.position[0] x axis')
+        plt.ylabel('node.position[1] y axis')
+        figure = plt.gcf()  # get current figure
+        figure.set_size_inches(10, 8)
+        plt.savefig('../Results/network_draw.png')
         #plt.show()
         # put outside
     def probe(self): # this method take a signal and analyze all the variables of interest without modifying state line
