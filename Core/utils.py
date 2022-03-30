@@ -86,7 +86,7 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
 
-    savefig_path = None ##### AVOIDED SAVE AS DEBUG
+    # savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path:
         # if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
         #     os.makedirs('../Results/Lab9')
@@ -119,7 +119,7 @@ def plot_bar(figure_num, list_data, x_ticks, edge_color='k', color=None, label='
     figure = plt.gcf()  # get current figure
     figure.set_size_inches(8, 6)
 
-    savefig_path = None ##### AVOIDED SAVE AS DEBUG
+    # savefig_path = None ##### AVOIDED SAVE AS DEBUG
     if savefig_path: # if None avoid save
         # if not os.path.isdir('../Results/Lab9'): # if Results doesn't exists, it creates it
         #     os.makedirs('../Results/Lab9')

@@ -209,7 +209,7 @@ plot_bar(figure_num=(13), list_data=[[number_connections_fixed_rate_per_M[i] for
          edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
          xlabel='M value for traffic matrix', ylabel='number of connections',
          title=('Point 7 Lab 9 - Number of connections - with best '+set_latency_or_snr), alpha=0.75,
-         savefig_path=None)
+         savefig_path=lab9_fig13)
 ################ Number Blocking Events
 plot_bar(figure_num=(14), list_data=[[number_blocking_events_fixed_rate_per_M[i] for i in range(0, len(M_list))],
                                            [number_blocking_events_flex_rate_per_M[i] for i in range(0, len(M_list))],
@@ -218,7 +218,7 @@ plot_bar(figure_num=(14), list_data=[[number_blocking_events_fixed_rate_per_M[i]
          edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
          xlabel='M value for traffic matrix', ylabel='number of blocking events',
          title=('Point 7 Lab 9 - Number of blocking events - with best '+set_latency_or_snr), alpha=0.75,
-         savefig_path=None)
+         savefig_path=lab9_fig14)
 ################ Capacity
 plot_bar(figure_num=(15), list_data=[[capacities_fixed_rate_per_M[i] for i in range(0, len(M_list))],
                                            [capacities_flex_rate_per_M[i] for i in range(0, len(M_list))],
@@ -227,7 +227,7 @@ plot_bar(figure_num=(15), list_data=[[capacities_fixed_rate_per_M[i] for i in ra
          edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
          xlabel='M value for traffic matrix', ylabel='Capacity [Gbps]',
          title=('Point 7 Lab 9 - Capacity - with best '+set_latency_or_snr), alpha=0.75,
-         savefig_path=None)
+         savefig_path=lab9_fig15)
 ################ Average Bit Rate
 plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i in range(0, len(M_list))],
                                            [average_bitrate_flex_rate_per_M[i] for i in range(0, len(M_list))],
@@ -236,7 +236,7 @@ plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i 
          edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
          xlabel='M value for traffic matrix', ylabel='Average Bit Rate [Gbps]',
          title=('Point 7 Lab 9 - Average Bit Rate - with best '+set_latency_or_snr), alpha=0.75,
-         savefig_path=None)
+         savefig_path=lab9_fig16)
 # plt.pause(1)
 
 file_print.close()
