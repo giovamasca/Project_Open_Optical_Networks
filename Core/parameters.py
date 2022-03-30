@@ -38,13 +38,23 @@ OCCUPIED = 0
 from pathlib import Path
 root = Path(__file__).parent.parent
 
+################## EXAM FILES
 ### Transceiver json files
-file_nodes_full_fixed_rate = root / 'Resources' / 'Lab_Networks' / 'nodes_full_fixed_rate.json'
-file_nodes_full_flex_rate = root / 'Resources' / 'Lab_Networks' / 'nodes_full_flex_rate.json'
-file_nodes_full_shannon = root / 'Resources' / 'Lab_Networks' / 'nodes_full_shannon.json'
+file_nodes_full_fixed_rate = root / 'Resources' / 'Exam_Networks' / 'full_fixed_rate_network_269725.json'
+file_nodes_full_flex_rate = root / 'Resources' / 'Exam_Networks' / 'full_flex_rate_network_269725.json'
+file_nodes_full_shannon = root / 'Resources' / 'Exam_Networks' / 'full_shannon_network_269725.json'
 ### Traditional with and without switching matrix files
-file_nodes_full = root / 'Resources' / 'Lab_Networks' / 'nodes_full.json'
-file_nodes_not_full = root / 'Resources' / 'Lab_Networks' / 'nodes_not_full.json'
+file_nodes_full = root / 'Resources' / 'Exam_Networks' / 'full_network_269725.json'
+file_nodes_not_full = root / 'Resources' / 'Exam_Networks' / 'not_full_network_269725.json'
+
+# ################## LABORATORY FILES
+# ### Transceiver json files
+# file_nodes_full_fixed_rate = root / 'Resources' / 'Lab_Networks' / 'nodes_full_fixed_rate.json'
+# file_nodes_full_flex_rate = root / 'Resources' / 'Lab_Networks' / 'nodes_full_flex_rate.json'
+# file_nodes_full_shannon = root / 'Resources' / 'Lab_Networks' / 'nodes_full_shannon.json'
+# ### Traditional with and without switching matrix files
+# file_nodes_full = root / 'Resources' / 'Lab_Networks' / 'nodes_full.json'
+# file_nodes_not_full = root / 'Resources' / 'Lab_Networks' / 'nodes_not_full.json'
 
 ### Results saved
 trial_path = 'best_' + set_latency_or_snr + '_of_' + time.strftime('%Y_%m_%d__%H_%M_%S')
