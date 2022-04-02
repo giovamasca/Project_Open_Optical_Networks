@@ -42,16 +42,24 @@ def random_generation_with_traffic_matrix_with_while(network, M_traffic=None, se
         connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr=set_lat_or_snr, use_state=True)
         # input_node = connection_generated.input
         # output_node = connection_generated.output
-        connections.append(connection_generated)
+        if connection_generated:
+            connections.append(connection_generated)
+        else:
+            print('\nWhile stopped by WATCHDOG\n')
+            return connections
         # i += 1
         # print(i)
     return connections
-def single_traffic_matrix_scenario(network, M_traffic_static, set_lat_or_snr, N_iterations):
+def single_traffic_matrix_scenario(network, M_traffic_static, set_lat_or_snr, N_iterations, file_console=None):
     network.reset(M_traffic_matrix=M_traffic_static)
     connections = []
     for i in range(0, N_iterations):
         connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr=set_lat_or_snr, use_state=True)
-        connections.append(connection_generated)
+        if connection_generated:
+            connections.append(connection_generated)
+        else:
+            print_and_save('\nWhile stopped by WATCHDOG\n', file=file_console)
+            return connections
     return connections
 def number_blocking_events_evaluation(connection_list):
     blocking_events = sum(connection.channel is None for connection in connection_list)
@@ -84,7 +92,7 @@ def print_and_save(text, file=None):
         file_print = open(file, 'a')
         print(text, file=file_print)
         file_print.close()
-def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
+def plot_histogram(figure_num=None, list_data=None, nbins=None, edge_color='k', color=None, label='', title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
@@ -111,7 +119,7 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
-    x = np.arange(len(x_ticks))
+    x = np.arange(len(x_ticks)) if x_ticks else 1
 
     fig = plt.figure(figure_num)
     # fig, ax = plt.subplots()
@@ -119,7 +127,7 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
 
     fig.subplots_adjust(bottom=bottom)
     for index in range(0, len(list_data)):
-        x_i = np.arange(len(x_ticks))
+        # x_i = np.arange(len(x_ticks))
         width=0.25
 
         x_i = x + width*( index + 0.5 - len(list_data) / 2 )
@@ -136,7 +144,14 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
 
-    ax.set_xticks(x, x_ticks)
+    if x_ticks:
+        ax.set_xticks(x, x_ticks)
+    else:
+        plt.tick_params( axis='x',  # changes apply to the x-axis
+            which='both',  # both major and minor ticks are affected
+            bottom=False,  # ticks along the bottom edge are off
+            top=False,  # ticks along the top edge are off
+            labelbottom=False)
     ax.legend(labels=label, bbox_to_anchor = bbox_to_anchor, loc = loc)
 
     figure = plt.gcf()  # get current figure
@@ -155,14 +170,20 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
 def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_console=None):
     from Project_Open_Optical_Networks.Core.science_utils import SNR_metrics, capacity_metrics
 
-    print_and_save(text='M=' + str(M) + ':', file=file_console)
+    results = {} # contains all results as a dictionary
 
-    connections = single_traffic_matrix_scenario(network=network, M_traffic_static=M, set_lat_or_snr=set_latency_or_snr, N_iterations=N_iterations)
+    # print_and_save(text='M=' + str(M) + ':', file=file_console)
 
-    print_and_save('Fixed Rate', file=file_console)
+    connections = single_traffic_matrix_scenario(network=network, M_traffic_static=M, set_lat_or_snr=set_latency_or_snr, N_iterations=N_iterations, file_console=file_console)
+    results['connections'] = connections
+
+    print_and_save(label + ' Rate', file=file_console)
 
     number_connections = len(connections)
     number_blocking_events = number_blocking_events_evaluation(connections)
+    results['number_connections'] = number_connections
+    results['number_blocking_events'] = number_blocking_events
+
 
     print_and_save('\tTotal connections for ' + label + ' network: ' + str(number_connections), file=file_console)
     print_and_save('\tBlocking events for ' + label + ' network: ' + str(number_blocking_events), file=file_console)
@@ -170,6 +191,13 @@ def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_conso
     ############## CAPACITY and BITRATE
     [SNR_ave_per_link, SNR_max, SNR_min] = SNR_metrics(connection_list=connections)
     [capacity, average_bitrate, bitrate_max, bitrate_min] = capacity_metrics(connections_list=connections)
+    results['SNR_ave_per_link'] = SNR_ave_per_link
+    results['SNR_max'] = SNR_max
+    results['SNR_min'] = SNR_min
+    results['capacity'] = capacity
+    results['average_bitrate'] = average_bitrate
+    results['bitrate_max'] = bitrate_max
+    results['bitrate_min'] = bitrate_min
 
     ## labels
     SNR_fixed_rate_label = '\t' + label + ' with average SNR = ' + str(np.round(SNR_ave_per_link, 3)) + ' dB, maximum SNR = ' +\
@@ -182,5 +210,5 @@ def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_conso
     print_and_save(text=capacity_fixed_rate_label, file=file_console)
     print_and_save(text=SNR_fixed_rate_label, file=file_console)
 
-    # plot_bar()
+    return results
 ########################################################################################################################

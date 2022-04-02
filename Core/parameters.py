@@ -66,6 +66,7 @@ if not os.path.isdir( root / 'Results' / Lab_folder[lab] / trial_path / 'Images'
     os.makedirs( root / 'Results' / Lab_folder[lab] / trial_path / 'Images' )
 
 file_console = root / 'Results' / Lab_folder[lab] / trial_path / 'console.txt'
+images_folder = root / 'Results' / 'Lab10' / trial_path / 'Images'
 ## LAB 8
 lab8_fig1 = root / 'Results' / 'Lab8' / 'lab8_fig1_node_couples_full_and_not_full.png'
 lab8_fig2 = root / 'Results' / 'Lab8' / 'lab8_fig2_node_couples_transceiver.png'
