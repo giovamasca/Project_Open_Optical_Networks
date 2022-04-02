@@ -59,8 +59,8 @@ def SNR_metrics(connection_list):
     total_SNR_linear = np.nansum( SNR_list )
     SNR_per_link_in_dB = linear_to_dB_conversion_power( total_SNR_linear / len(connection_list) )
 
-    SNR_max = max( linear_to_dB_conversion_power( SNR_list ) )
-    SNR_min = min( linear_to_dB_conversion_power( SNR_list ) )
+    SNR_max = linear_to_dB_conversion_power( max( SNR_list ) )
+    SNR_min = linear_to_dB_conversion_power( min( SNR_list ) )
     return [SNR_per_link_in_dB, SNR_max, SNR_min]
 def capacity_metrics(connections_list):
     [capacity, average_bit_rate] = capacity_and_average_bit_rate(connections_list=connections_list)
