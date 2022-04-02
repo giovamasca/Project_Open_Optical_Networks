@@ -33,7 +33,7 @@ def random_generation_for_network(network, Numb_sim, network_label=None, set_lat
         # avarage_bit_rate += connection_generated.bit_rate
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
-def random_generation_with_traffic_matrix(network, M_traffic=None, set_lat_or_snr=None):
+def random_generation_with_traffic_matrix_with_while(network, M_traffic=None, set_lat_or_snr=None):
     set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'SNR'
     network.reset(M_traffic_matrix=M_traffic)
     connections = []
@@ -45,6 +45,13 @@ def random_generation_with_traffic_matrix(network, M_traffic=None, set_lat_or_sn
         connections.append(connection_generated)
         # i += 1
         # print(i)
+    return connections
+def single_traffic_matrix_scenario(network, M_traffic_static, set_lat_or_snr, N_iterations):
+    network.reset(M_traffic_matrix=M_traffic_static)
+    connections = []
+    for i in range(0, N_iterations):
+        connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr=set_lat_or_snr, use_state=True)
+        connections.append(connection_generated)
     return connections
 def number_blocking_events_evaluation(connection_list):
     blocking_events = sum(connection.channel is None for connection in connection_list)
@@ -71,7 +78,12 @@ def connection_list_data_extractor(connection_list, type_data):
         print('Error in type_data for connection list extractor!')
         exit(5)
     return list_data
-
+def print_and_save(text, file=None):
+    print(text)
+    if file:
+        file_print = open(file, 'a')
+        print(text, file=file_print)
+        file_print.close()
 def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
@@ -95,7 +107,7 @@ def plot_histogram(figure_num, list_data, nbins, edge_color, color, label, title
     # fig.canvas.draw()
     # plt.pause(0.25)
     return
-def plot_bar(figure_num, list_data, x_ticks, edge_color='k', color=None, label='', title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
+def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', color=None, label='', title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
@@ -106,9 +118,20 @@ def plot_bar(figure_num, list_data, x_ticks, edge_color='k', color=None, label='
     ax = plt.gca()
 
     fig.subplots_adjust(bottom=bottom)
-    plt.bar( x=x-0.25, width=0.25, height=list_data[0], edgecolor=edge_color, color = color, alpha=alpha)
-    plt.bar(x=x+0.0, width=0.25, height=list_data[1], edgecolor=edge_color, color=color, alpha=alpha)
-    plt.bar(x=x+0.25, width=0.25, height=list_data[2], edgecolor=edge_color, color=color, alpha=alpha)
+    for index in range(0, len(list_data)):
+        x_i = np.arange(len(x_ticks))
+        width=0.25
+
+        x_i = x + width*( index + 0.5 - len(list_data) / 2 )
+
+        # if index + 0.5 < len(list_data) / 2 :
+        #     x_i = x - width*(len(list_data) / 2 - index + 0.5 )
+        # elif index + 0.5 > len(list_data) / 2 :
+        #     x_i = x + width*index
+        plt.bar(x = x_i , width=width, height=list_data[index], edgecolor=edge_color, color=color[index] if color else None, alpha=alpha)
+    # plt.bar( x=x-0.25, width=0.25, height=list_data[0], edgecolor=edge_color, color = color, alpha=alpha)
+    # plt.bar(x=x+0.0, width=0.25, height=list_data[1], edgecolor=edge_color, color=color, alpha=alpha)
+    # plt.bar(x=x+0.25, width=0.25, height=list_data[2], edgecolor=edge_color, color=color, alpha=alpha)
     plt.title(title)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
@@ -128,3 +151,36 @@ def plot_bar(figure_num, list_data, x_ticks, edge_color='k', color=None, label='
     # fig.canvas.draw()
     # plt.pause(0.25)
     return
+###########################################      LAB 10     ############################################################
+def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_console=None):
+    from Project_Open_Optical_Networks.Core.science_utils import SNR_metrics, capacity_metrics
+
+    print_and_save(text='M=' + str(M) + ':', file=file_console)
+
+    connections = single_traffic_matrix_scenario(network=network, M_traffic_static=M, set_lat_or_snr=set_latency_or_snr, N_iterations=N_iterations)
+
+    print_and_save('Fixed Rate', file=file_console)
+
+    number_connections = len(connections)
+    number_blocking_events = number_blocking_events_evaluation(connections)
+
+    print_and_save('\tTotal connections for ' + label + ' network: ' + str(number_connections), file=file_console)
+    print_and_save('\tBlocking events for ' + label + ' network: ' + str(number_blocking_events), file=file_console)
+
+    ############## CAPACITY and BITRATE
+    [SNR_ave_per_link, SNR_max, SNR_min] = SNR_metrics(connection_list=connections)
+    [capacity, average_bitrate, bitrate_max, bitrate_min] = capacity_metrics(connections_list=connections)
+
+    ## labels
+    SNR_fixed_rate_label = '\t' + label + ' with average SNR = ' + str(np.round(SNR_ave_per_link, 3)) + ' dB, maximum SNR = ' +\
+                            str(np.round(SNR_max, 3)) + ' dB, minimum SNR = ' + str(np.round(SNR_min, 3)) + ' dB'
+    capacity_fixed_rate_label = '\t' + label + ' with average Rb = ' + str(np.round(average_bitrate, 3)) + ' Gbps and C = ' +\
+                           str(np.round(capacity * 1e-3, 3)) + ' Tbps, ' +\
+                           'maximum bit rate = ' + str(np.round(bitrate_max, 3)) + ' Gbps and minimum bit rate = ' +\
+                           str(np.round(bitrate_min, 3)) + ' Gbps.'
+
+    print_and_save(text=capacity_fixed_rate_label, file=file_console)
+    print_and_save(text=SNR_fixed_rate_label, file=file_console)
+
+    # plot_bar()
+########################################################################################################################

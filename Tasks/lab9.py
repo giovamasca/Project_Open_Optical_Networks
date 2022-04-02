@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt # in utils
 
 from Project_Open_Optical_Networks.Core.parameters import *
 from Project_Open_Optical_Networks.Core.utils import *
 
-from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarage_bit_rate as capacity_and_avarage
+from Project_Open_Optical_Networks.Core.science_utils import capacity_and_average_bit_rate as capacity_and_avarage
 
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance
@@ -93,7 +93,7 @@ for M in [1, 5, 15, 25, 35, 45, 55]: # [1, 10, 25, 45, 60] # range(1, 47, 9)
     ################### FIXED RATE #####################
     print('\t\tFor M = ', str(M), ':')
     print('\t\tFor M = ', str(M), ':', file=file_print)
-    connections_fixed_rate = random_generation_with_traffic_matrix(network=network_fixed_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
+    connections_fixed_rate = random_generation_with_traffic_matrix_with_while(network=network_fixed_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Fixed Rate')
     print('Fixed Rate', file=file_print)
     number_connections_fixed_rate = len(connections_fixed_rate)
@@ -116,7 +116,7 @@ for M in [1, 5, 15, 25, 35, 45, 55]: # [1, 10, 25, 45, 60] # range(1, 47, 9)
     print('\t' + fixed_rate_label, file=file_print)
 
     ################### FLEX RATE #######################à
-    connections_flex_rate = random_generation_with_traffic_matrix(network=network_flex_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
+    connections_flex_rate = random_generation_with_traffic_matrix_with_while(network=network_flex_rate, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Flex Rate')
     print('Flex Rate', file=file_print)
     number_connections_flex_rate = len(connections_flex_rate)
@@ -139,7 +139,7 @@ for M in [1, 5, 15, 25, 35, 45, 55]: # [1, 10, 25, 45, 60] # range(1, 47, 9)
     print('\t' + flex_rate_label, file=file_print)
 
     ################### SHANNON RATE ########################
-    connections_shannon = random_generation_with_traffic_matrix(network=network_shannon, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
+    connections_shannon = random_generation_with_traffic_matrix_with_while(network=network_shannon, M_traffic=M, set_lat_or_snr=set_latency_or_snr)
     print('Shannon Rate')
     print('Shannon Rate', file=file_print)
     number_connections_shannon = len(connections_shannon)

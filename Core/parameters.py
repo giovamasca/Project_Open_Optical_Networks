@@ -1,6 +1,9 @@
 import os
 import time
 
+executed_lab = {'9':0, '10':1} # select results folder
+lab = executed_lab[str(10)] # put the lab it is executed
+
 ########### GLOBAL VARIABLES ###########
 #### SET FIND BEST CONDITION at the beginning
 set_latency_or_snr = 'SNR' # 'SNR' or 'latency' for find best
@@ -57,11 +60,12 @@ file_nodes_not_full = root / 'Resources' / 'Exam_Networks' / 'not_full_network_2
 # file_nodes_not_full = root / 'Resources' / 'Lab_Networks' / 'nodes_not_full.json'
 
 ### Results saved
+Lab_folder = ['Lab9', 'Lab10']
 trial_path = 'best_' + set_latency_or_snr + '_of_' + time.strftime('%Y_%m_%d__%H_%M_%S')
-if not os.path.isdir( root / 'Results' / 'Lab9' / trial_path / 'Images' ):  # if Results doesn't exists, it creates it
-    os.makedirs( root / 'Results' / 'Lab9' / trial_path / 'Images' )
+if not os.path.isdir( root / 'Results' / Lab_folder[lab] / trial_path / 'Images' ):  # if Results doesn't exists, it creates it
+    os.makedirs( root / 'Results' / Lab_folder[lab] / trial_path / 'Images' )
 
-file_console = root / 'Results' / 'Lab9' / trial_path / 'console.txt'
+file_console = root / 'Results' / Lab_folder[lab] / trial_path / 'console.txt'
 ## LAB 8
 lab8_fig1 = root / 'Results' / 'Lab8' / 'lab8_fig1_node_couples_full_and_not_full.png'
 lab8_fig2 = root / 'Results' / 'Lab8' / 'lab8_fig2_node_couples_transceiver.png'

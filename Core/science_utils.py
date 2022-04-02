@@ -49,11 +49,25 @@ def bit_rate_evaluation(GSNR_lin, strategy):
         exit(5)
     return Rb # returned in Gbps
 
-def capacity_and_avarage_bit_rate(connections_list):
+def capacity_and_average_bit_rate(connections_list):
     capacity = np.nansum( [connections_list[i].bit_rate for i in range(0, len(connections_list))] )
     avarage_bit_rate = capacity / len(connections_list)
     return [capacity, avarage_bit_rate]
+def SNR_metrics(connection_list):
+    ### averaging on linear quantities
+    SNR_list = [dB_to_linear_conversion_power( connection_list[i].snr ) for i in range(0, len(connection_list))]
+    total_SNR_linear = np.nansum( SNR_list )
+    SNR_per_link_in_dB = linear_to_dB_conversion_power( total_SNR_linear / len(connection_list) )
 
+    SNR_max = max( linear_to_dB_conversion_power( SNR_list ) )
+    SNR_min = min( linear_to_dB_conversion_power( SNR_list ) )
+    return [SNR_per_link_in_dB, SNR_max, SNR_min]
+def capacity_metrics(connections_list):
+    [capacity, average_bit_rate] = capacity_and_average_bit_rate(connections_list=connections_list)
+    bitrate_list = [connections_list[i].bit_rate for i in range(0, len(connections_list))]
+    bitrate_max = max(bitrate_list)
+    bitrate_min = min(bitrate_list)
+    return [capacity, average_bit_rate, bitrate_max, bitrate_min]
 def alpha_from_dB_to_linear_value(alpha_in_dB):
     return alpha_in_dB/(20*np.log10(np.exp(1)))
 

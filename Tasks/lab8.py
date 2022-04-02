@@ -66,7 +66,7 @@ plot_histogram(figure_num = 4, list_data=[ connection_list_data_extractor(connec
 ##################################################################################################################
 # BIT RATE
 ##################################################################################################################
-from Project_Open_Optical_Networks.Core.science_utils import capacity_and_avarage_bit_rate as capacity_and_average
+from Project_Open_Optical_Networks.Core.science_utils import capacity_and_average_bit_rate as capacity_and_average
 
 [capacity_fixed_rate, avarage_fixed_rate] = capacity_and_average(connections['fixed_rate'])
 fixed_rate_label = 'Fixed Rate with avarage Rb=' + str(avarage_fixed_rate*1e-9) + ' Gbps and C=' + str(capacity_fixed_rate*1e-9) + ' Gbps'

@@ -754,7 +754,7 @@ class Connection:  # class that define a connection between two nodes
         self._output = output_node  # ending node
         self._signal_power = signal_power if signal_power else float(1e-3)  # signal power definition, if not defined set to 1 mW
         self._latency = float(0)  # latency set to 0
-        self._snr = float(0)  # snr set to 0
+        self._snr = float(0)  # snr set to 0 dB
         self._channel = channel if channel else int(0) # channel of interest if defined
         self._bit_rate = bit_rate  # the bit rate of the connection
     @property
