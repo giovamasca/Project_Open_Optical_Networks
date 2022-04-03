@@ -345,7 +345,7 @@ class Network: # this is the most important class and define the network from th
         while ( self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
             [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
             watchdog += 1
-            if watchdog >= 500: # when loop becomes too long, break out it. None is evaluated by origin to avoid computation still in loop.
+            if watchdog >= watchdog_limit: # when loop becomes too long, break out it. None is evaluated by origin to avoid computation still in loop.
                 # print('WATCHDOG break operation, no more traffic matrix available!')
                 return None
         connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection
@@ -560,6 +560,18 @@ class Network: # this is the most important class and define the network from th
         plt.savefig('../Results/network_draw.png')
         #plt.show()
         # put outside
+    def area_network(self):
+        ### Shoelace formula
+        x = [self.nodes[key].position[0] for key in ['A', 'C', 'B', 'F', 'E']]
+        y = [self.nodes[key].position[1] for key in ['A', 'C', 'B', 'F', 'E']]
+        vertex_number = len(x)
+        area = float(0)
+
+        for i in range(0, vertex_number-1):
+            area += ( y[i] + y[i+1] ) * ( x[i] - x[i+1] )
+        area += ( y[vertex_number-1] + y[0] ) * ( x[vertex_number-1] - x[0] )
+        area = area/2
+        return area
     def probe(self): # this method take a signal and analyze all the variables of interest without modifying state line
         nodes = self.nodes.keys() # take all node labels
         couples = []

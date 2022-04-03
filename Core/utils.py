@@ -12,7 +12,7 @@ from Project_Open_Optical_Networks.Core.elements import Connection, Network
 def network_generation_from_file(network_file):
     network = Network(network_file)
     return network
-def random_generation_for_network(network, Numb_sim, network_label=None, set_lat_or_snr=None): # network and sumber of simulations
+def random_generation_for_network(network, Numb_sim, network_label=None, set_lat_or_snr=None): # network and sumber of simulations - lab 9
     set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'SNR' # default
     nodes_gener = list(network.nodes.keys())  # extracts all nodes
 
@@ -33,19 +33,22 @@ def random_generation_for_network(network, Numb_sim, network_label=None, set_lat
         # avarage_bit_rate += connection_generated.bit_rate
     print('Evaluated ', Numb_sim, ' simulations for network ', network_label)
     return connections_generated
-def random_generation_with_traffic_matrix_with_while(network, M_traffic=None, set_lat_or_snr=None):
+def random_generation_with_traffic_matrix_with_while(network, M_traffic=None, set_lat_or_snr=None): # lab 9 Monte Carlo run
+    from Project_Open_Optical_Networks.Core.parameters import watchdog_limit
+
     set_lat_or_snr = set_lat_or_snr if set_lat_or_snr else 'SNR'
     network.reset(M_traffic_matrix=M_traffic)
     connections = []
-    # i=0
+    watchdog = 0
     while not network.traffic_matrix_saturated(): # generates a list until network is saturated
         connection_generated = network.connection_with_traffic_matrix(set_latency_or_snr=set_lat_or_snr, use_state=True)
         # input_node = connection_generated.input
         # output_node = connection_generated.output
-        if connection_generated:
+        watchdog += 1
+        if connection_generated and watchdog<=watchdog_limit:
             connections.append(connection_generated)
         else:
-            print('\nWhile stopped by WATCHDOG\n')
+            print('\nWhile stopped by WATCHDOG\nNo more connections available, even if network is not saturated')
             return connections
         # i += 1
         # print(i)

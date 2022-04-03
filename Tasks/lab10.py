@@ -4,8 +4,15 @@
 from Project_Open_Optical_Networks.Core.utils import *
 from Project_Open_Optical_Networks.Core.science_utils import *
 
-N_iterations = Number_simulations
+trial_path = 'best_' + set_latency_or_snr + '_of_' + time.strftime('%Y_%m_%d__%H_%M_%S')
+if not os.path.isdir( root / 'Results' / 'Lab10' / trial_path / 'Images' ):  # if Results doesn't exists, it creates it
+    os.makedirs( root / 'Results' / 'Lab10' / trial_path / 'Images' )
+file_console = root / 'Results' / 'Lab10' / trial_path / 'console.txt'
+images_folder = root / 'Results' / 'Lab10' / trial_path / 'Images'
 
+################             N  simulations            ####################
+N_iterations = Number_simulations
+###########################################################################
 file_print = open(file_console, 'w')
 file_print.close()
 ############ NETWORKs GENERATION
@@ -13,6 +20,15 @@ file_print.close()
 network_fixed_rate = network_generation_from_file(file_nodes_full_fixed_rate)
 network_flex_rate = network_generation_from_file(file_nodes_full_flex_rate)
 network_shannon = network_generation_from_file(file_nodes_full_shannon)
+
+####### Network size analysis ######
+CD_distance = network_flex_rate.lines['CD'].length
+DE_distance = np.sqrt(np.sum( np.power(np.array(network_flex_rate.nodes['D'].position) - np.array(network_flex_rate.nodes['E'].position), 2) ))
+max_ray = max(CD_distance, DE_distance)
+print_and_save('The Network has a ray almost around ' + str(np.round(max_ray*1e-3, 3)) + ' km.', file=file_console)
+area_network = network_flex_rate.area_network()*1e-6 # km^2
+print_and_save('The Network cover an area of ' + str(np.round(area_network,3)) + ' km square', file=file_console)
+####################################
 
 # LABELS
 fixed = 'fixed_rate'

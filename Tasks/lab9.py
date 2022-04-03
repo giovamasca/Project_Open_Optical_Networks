@@ -5,6 +5,34 @@ from Project_Open_Optical_Networks.Core.utils import *
 
 from Project_Open_Optical_Networks.Core.science_utils import capacity_and_average_bit_rate as capacity_and_avarage
 
+trial_path = 'best_' + set_latency_or_snr + '_of_' + time.strftime('%Y_%m_%d__%H_%M_%S')
+if not os.path.isdir( root / 'Results' / 'Lab9' / trial_path / 'Images' ):  # if Results doesn't exists, it creates it
+    os.makedirs( root / 'Results' / 'Lab9' / trial_path / 'Images' )
+file_console = root / 'Results' / 'Lab9' / trial_path / 'console.txt'
+
+# point 5
+lab9_fig1 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig1_point5_IO_best_' + set_latency_or_snr)
+lab9_fig2 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig2_point5_SNR_best_' + set_latency_or_snr)
+lab9_fig3 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig3_point5_Rb_best_' + set_latency_or_snr)
+# point 7
+# SNR
+lab9_fig4 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig4_point7_SNR_fixed_best_' + set_latency_or_snr)
+lab9_fig5 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig5_point7_SNR_flex_best_' + set_latency_or_snr)
+lab9_fig6 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig6_point7_SNR_shannon_best_' + set_latency_or_snr)
+# BITRATE
+lab9_fig7 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig7_point7_Rb_fixed_best_' + set_latency_or_snr)
+lab9_fig8 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig8_point7_Rb_flex_best_' + set_latency_or_snr)
+lab9_fig9 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig9_point7_Rb_shannon_best_' + set_latency_or_snr)
+# LAT
+lab9_fig10 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig10_point7_latency_fixed_best_' + set_latency_or_snr)
+lab9_fig11 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig11_point7_latency_flex_best_' + set_latency_or_snr)
+lab9_fig12 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig12_point7_latency_shannon_best_' + set_latency_or_snr)
+##############################################################################################
+lab9_fig13 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig13_point7_number_of_connections_best_' + set_latency_or_snr)
+lab9_fig14 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig14_point7_number_of_blocking_events_best_' + set_latency_or_snr)
+lab9_fig15 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig15_point7_capacities_best_' + set_latency_or_snr)
+lab9_fig16 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig16_point7_average_bitrate_best_' + set_latency_or_snr)
+
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance
 network_fixed_rate = network_generation_from_file(file_nodes_full_fixed_rate)
@@ -87,7 +115,7 @@ capacities_shannon_per_M = []
 average_bitrate_shannon_per_M = []
 
 M_list = []
-for M in [1, 5, 15, 25, 35, 45, 55]: # [1, 10, 25, 45, 60] # range(1, 47, 9)
+for M in range(1, 34, 4): # [1, 10, 25, 45, 60] # range(1, 47, 9)
     M_list.append(M)
 
     ################### FIXED RATE #####################
