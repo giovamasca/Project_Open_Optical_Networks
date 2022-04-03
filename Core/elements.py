@@ -55,7 +55,7 @@ class SignalInformation: # this is the class of the signal
 
 #### This class is for Lightpath objects
 class Lightpath( SignalInformation ): # inherited class from signal information
-    def __init__(self, signal_power=1.0, path=None, channel=None):
+    def __init__(self, signal_power=1.0, path=None, channel=None, Rs=None, DeltaF=None):
         SignalInformation.__init__(self, signal_power, path) # same initial state as signal information
         # channel goes from 0 to 9, 10 slots overall
         self._channel = int(channel) if channel >= 0 and channel <= number_of_active_channels - 1 else (print('Error, channel', str(channel), 'avoided'), exit(2))
@@ -63,8 +63,8 @@ class Lightpath( SignalInformation ): # inherited class from signal information
         # there is a channel attribute more than signal information class, by the way this attribute has constrains
         # if these constrains are not respected the code exits with an error state
         ####### LAB 8 attributes
-        self._Rs = None # symbol rate in GBaud/s
-        self._df = None # channel spacing between two adjacent frequencies
+        self._Rs = Rs if Rs else Rs_symbol_rate # symbol rate in Baud/s
+        self._df = DeltaF if DeltaF else channel_spacing # channel spacing between two adjacent frequencies
     @property
     def channel(self): # channel is a private value, once defined could not be changed
         return self._channel
@@ -744,14 +744,19 @@ class Network: # this is the most important class and define the network from th
             path_label += node + '->'
         path_label = path_label[:-2]
 
+        if hasattr(lightpath, 'channel'): # only lightpath has these attributes
+            Rs = lightpath.Rs
+            DeltaF = lightpath.df
+        else:
+            Rs = Rs_symbol_rate
+            DeltaF = channel_spacing
+
         # let's find the corresponding SNR for path label at input and obtain it as a floating number
         GSNR_dB = self.weighted_paths['SNR'].loc[self.weighted_paths['path'] == path_label].item()
         GSNR_lin = dB_to_linear_conversion_power(GSNR_dB) # in linear value
 
-        bit_rate = bit_rate_evaluation(GSNR_lin, strategy)
-        if hasattr(lightpath, 'channel'): # only lightpath has these attributes
-            lightpath.Rs = Rs_symbol_rate
-            lightpath.df = channel_spacing
+        bit_rate = bit_rate_evaluation(GSNR_lin, strategy, Rs)
+
         return bit_rate
 
 class Connection:  # class that define a connection between two nodes

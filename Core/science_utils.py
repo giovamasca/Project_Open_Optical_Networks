@@ -27,11 +27,11 @@ def dB_to_linear_conversion_power(dB_quantity):
 def linear_to_dB_conversion_power(linear_quantity):
     return 10*np.log10(linear_quantity)
 
-def bit_rate_evaluation(GSNR_lin, strategy):
+def bit_rate_evaluation(GSNR_lin, strategy, Rs):
     Rb = 0
-    first_formula = 2 * Rs_symbol_rate / Bn_noise_band * (np.power(erfcinv(2 * BER_target), 2))
-    second_formula = 14 / 3 * Rs_symbol_rate / Bn_noise_band * (np.power(erfcinv(3 / 2 * BER_target), 2))
-    third_formula = 10 * Rs_symbol_rate / Bn_noise_band * (np.power(erfcinv(8 / 3 * BER_target), 2))
+    first_formula = 2 * Rs / Bn_noise_band * (np.power(erfcinv(2 * BER_target), 2))
+    second_formula = 14 / 3 * Rs / Bn_noise_band * (np.power(erfcinv(3 / 2 * BER_target), 2))
+    third_formula = 10 * Rs / Bn_noise_band * (np.power(erfcinv(8 / 3 * BER_target), 2))
     if strategy == 'fixed_rate':
         if GSNR_lin >= first_formula:
             Rb = 100 # Gbps
@@ -43,7 +43,7 @@ def bit_rate_evaluation(GSNR_lin, strategy):
         elif GSNR_lin >= third_formula:
             Rb = 400
     elif strategy == 'shannon':
-        Rb = 2 * Rs_symbol_rate * np.log2(1 + GSNR_lin * Rs_symbol_rate / Bn_noise_band) * 1e-9 # Gbps
+        Rb = 2 * Rs * np.log2(1 + GSNR_lin * Rs / Bn_noise_band) * 1e-9 # Gbps
     else:
         print('ERROR in strategy definition')
         exit(5)
