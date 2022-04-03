@@ -341,11 +341,11 @@ class Network: # this is the most important class and define the network from th
         #     return None # if there is no possible connection, return None
         nodes_gener = list(self.nodes.keys())  # extracts all nodes
         [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels
-        watchdog = 0
+        watchdog = 0 # put to avoid infinite loop
         while ( self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
             [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
             watchdog += 1
-            if watchdog >= 100:
+            if watchdog >= 500: # when loop becomes too long, break out it. None is evaluated by origin to avoid computation still in loop.
                 # print('WATCHDOG break operation, no more traffic matrix available!')
                 return None
         connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection

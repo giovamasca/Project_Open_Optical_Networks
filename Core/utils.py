@@ -58,7 +58,11 @@ def single_traffic_matrix_scenario(network, M_traffic_static, set_lat_or_snr, N_
         if connection_generated:
             connections.append(connection_generated)
         else:
-            print_and_save('\nWhile stopped by WATCHDOG\n', file=file_console)
+            print_and_save('\nWhile stopped by WATCHDOG.', file=file_console)
+            if network.traffic_matrix_saturated():
+                print_and_save('Following connections have saturated traffic matrix.\n', file=file_console)
+            else:
+                print_and_save('Following connections have unsaturated traffic matrix, but all states occupied.\n', file=file_console)
             return connections
     return connections
 def number_blocking_events_evaluation(connection_list):
@@ -167,7 +171,7 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
     # plt.pause(0.25)
     return
 ###########################################      LAB 10     ############################################################
-def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_console=None):
+def lab10_point1_results(network, M, set_latency_or_snr, N_iterations, label, file_console=None):
     from Project_Open_Optical_Networks.Core.science_utils import SNR_metrics, capacity_metrics
 
     results = {} # contains all results as a dictionary
@@ -211,4 +215,143 @@ def lab10_point1(network, M, set_latency_or_snr, N_iterations, label, file_conso
     print_and_save(text=SNR_fixed_rate_label, file=file_console)
 
     return results
+def lab10_point1_graphs(initial_fig, images_folder, results, set_latency_or_snr, M):
+    ########################################            FIGURE    SNR         #################################################
+    fig_num = initial_fig
+    preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_SNR_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'SNRs with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_histogram(figure_num=fig_num, list_data=[
+        connection_list_data_extractor(connection_list=results[label]['connections'], type_data='SNR') for label in
+        results],
+                   xlabel='SNR [dB]', ylabel='Number of results', nbins=15, alpha=0.75,
+                   label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE   LAT         #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_latency_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Latencies with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_histogram(figure_num=fig_num, list_data=[
+        np.array(connection_list_data_extractor(connection_list=results[label]['connections'], type_data='LAT')) * 1e3
+        for label in results],
+                   xlabel='delay [ms]', ylabel='Number of results', nbins=15, alpha=0.75,
+                   label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE    BITRATES        #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_bitrate_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Bit Rates with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_histogram(figure_num=fig_num, list_data=[
+        connection_list_data_extractor(connection_list=results[label]['connections'], type_data='Rb') for label in
+        results],
+                   xlabel='Gbps', ylabel='Number of results', nbins=15, alpha=0.75,
+                   label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     num CONNECTIONS       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / ('lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-',
+                                                                                                               '') + '_number_connections_' + \
+                                    '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Number of connections with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['number_connections'] for label in results],
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     num BLOCKING EVENTS       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / ('lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-',
+                                                                                                               '') + '_number_blocking_events_' + \
+                                    '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Number of blocking events with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['number_blocking_events'] for label in results],
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     CAPACITIES       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_capacities_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Capacities with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=np.array([results[label]['capacity'] for label in results]) * 1e-3,
+             ylabel='[Tbps]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     BITRATE MAX       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_max_bitrate_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Maximum Bit Rates with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['bitrate_max'] for label in results], ylabel='[Gbps]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     BITRATE MIN       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_min_bitrate_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Minimum Bit Rates with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['bitrate_min'] for label in results], ylabel='[Gbps]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     SNR per link       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_SNR_per_link_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'SNRs per link (average) with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['SNR_ave_per_link'] for label in results], ylabel='[dB]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     SNR MAX       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_max_SNR_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Maximum SNRs with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['SNR_max'] for label in results], ylabel='[dB]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    ########################################            FIGURE     SNR MAX       #################################################
+    fig_num = fig_num + 1
+    # preface_title = 'Lab 10 Point 1 - '
+    savefig_path = images_folder / (
+                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_min_SNR_' + \
+                '_with_M_' + str(M) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Minimum SNRs with M = ' + str(M) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[results[label]['SNR_min'] for label in results], ylabel='[dB]',
+             x_ticks=None, xlabel='M=' + str(M), alpha=0.75, bottom=0.25, bbox_to_anchor=(0.5, -0.35),
+             loc='lower center',
+             label=[label for label in results], title=title, savefig_path=savefig_path)
+    #######################################################################################################################
+    final_fig = fig_num
+    return final_fig
 ########################################################################################################################
