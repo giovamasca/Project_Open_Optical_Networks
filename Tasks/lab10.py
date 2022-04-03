@@ -35,7 +35,7 @@ initial_fig = lab10_point1_graphs(initial_fig=1, images_folder=images_folder, re
 print_and_save(text='\n\nLab 10 Point 2 - Monte Carlo Simulation with Network Congestion', file=file_console)
 results_per_M = {}
 
-M_list = [ 1, 5, 10, 20, 30, 35]
+M_list = [ 1, 5, 15, 35, 45, 55]
 for M in M_list:
     print_and_save(text='\nM=' + str(M) + ':', file=file_console)
     results_per_M[str(M)] = {}#{'Fixed_Rate':{}, 'Flex_Rate':{}, 'Shannon_Rate':{}}
@@ -48,4 +48,4 @@ for M in M_list:
 colors = ['r', 'y', 'b']
 lab10_point2_graphs(initial_fig=initial_fig, results_per_M=results_per_M, M_list=M_list, images_folder=images_folder, N_iterations=N_iterations, set_latency_or_snr=set_latency_or_snr, colors=colors)
 
-# plt.show()
+plt.show()

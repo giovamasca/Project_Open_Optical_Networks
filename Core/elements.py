@@ -12,6 +12,7 @@ class SignalInformation: # this is the class of the signal
         self._noise_power = float(0) # noise floor, will be defined by length of each line and power of signal
         self._latency = float(0) # latency in seconds
         self._path = path if path else 'ABD' # if a path is defined, else there is a standard definition
+        self._ISNR = float(0)
     @property # property is to protect attributes
     def signal_power(self):
         return self._signal_power
@@ -24,6 +25,9 @@ class SignalInformation: # this is the class of the signal
     @property
     def path(self):
         return self._path
+    @property
+    def ISNR(self):
+        return self._ISNR
     @signal_power.setter # to set external vaslues to private attributes
     def signal_power(self, signal_power):
         self._signal_power=signal_power
@@ -36,8 +40,11 @@ class SignalInformation: # this is the class of the signal
     @path.setter
     def path(self, path):
         self._path=path
-    def decrement_power(self, power_to_update): # reduce power along path, not yet used
-        self.signal_power -= power_to_update
+    @ISNR.setter
+    def ISNR(self, ISNR):
+        self._ISNR=ISNR
+    def increment_ISNR(self, ISNR):
+        self.ISNR += ISNR
     def increment_noise(self, noise_to_update): # add noise along path
         self.noise_power += noise_to_update
     def increment_latency(self, latency_to_update): # each line introduce a latency
@@ -126,7 +133,6 @@ class Node: # class for node definition
             label = path[0:2] # the actual line is defined by the first teo nodes of path
             line = self.successive[label] # line object address is in successive with specific label (defined in connect() method)
             # we extract line of interest defined by actual line, for example we are in node A and path[:2]=AB, so line will be AB line object address
-            signal_information.signal_power = line.optimized_launch_power() # each time the node evaluate the optimum launch power
             signal_information.path_update() # remove first node on path
             signal_information = line.probe(signal_information) # to continue probe it recall same method in line class (line is AB in the example, so it will propagate on these line)
         # probe propagation will continue until the path as at least two node, if it has only one node the probe is finished and return all recursive functions
@@ -154,6 +160,8 @@ class Line: # class for line objects
         self._eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD,
                                      gamma_NL=self.gamma_non_linearity, Rs=Rs_symbol_rate, DeltaF=channel_spacing,
                                      N_channels=number_of_active_channels, L_eff=self.L_effective)
+        #### for SNR
+        self.last_span_length = self.length - (self.n_amplifier - 2)*span_length # evaluates last span length to reduce power for snr
     @property
     def label(self):
         return self._label
@@ -227,10 +235,14 @@ class Line: # class for line objects
         P_out_line = np.power(argument, 1/3)
         return P_out_line
     def probe(self, signal_information): # this function is called by node method
+        signal_information.signal_power = self.optimized_launch_power() * dB_to_linear_conversion_power(-self.alpha_in_dB * self.last_span_length)  # each time the node evaluate the optimum launch power
         latency = latency_evaluation(self.length) # generates latency for current line
         noise_power = self.noise_generation(signal_power=signal_information.signal_power) # generates noise, requires signal power
         signal_information.increment_latency(latency) # update latency accumulated in signal
         signal_information.increment_noise(noise_power) # update noise accumulated in signal
+
+        ISNR = noise_power / signal_information.signal_power
+        signal_information.increment_ISNR(ISNR)
 
         node = self.successive[signal_information.path[0]] # remember that before calling this class method tha path has removed first node,
         # so we are calling as successive the first node of the current path, that will be next node to analyze.
@@ -248,18 +260,6 @@ class Network: # this is the most important class and define the network from th
         self._file_name = json_file # to restore switching matrix
 
         self.node_reading_from_file() # read file and creates nodes
-        # for first_node in self.nodes: # first node is node label, being equal to key
-        #     for second_node in self.nodes[first_node].connected_nodes: # for each connected node is defined a line and successives
-        #         line_label = first_node + second_node # line by starting node and its connected one
-        #         # the length is evaluated thanks to numpy array:
-        #         # first of all there is a difference between x and y (x_length = x2 - x1, y_length = y2 - y1), they may be negative
-        #         # then is obtained the power of two of each coordinate length: x_length^2, y_length^2, no abs required thanks to it
-        #         # then they are added, for Pythagorean theorem: sum=(x_length^2)+(y_length^2)
-        #         # then the length is obtained with square root: sqrt( sum )
-        #         line_length = np.sqrt( np.sum( np.power( np.array(self.nodes[first_node].position) - np.array(self.nodes[second_node].position) , 2) ) )
-        #         self.lines[line_label] = Line(line_label, line_length) # each line is defined
-        # call automatically the other methods of initialization
-        # self.connect()
         self.probe()
         self.route_space_update()
         ### TRAFFIC MATRIX
@@ -594,7 +594,8 @@ class Network: # this is the most important class and define the network from th
 
                 # snr defined as dB, so 10 log10 of ratio between signal power and noise power
                 # if condition seems useless here, because there is no channel, is just a probe
-                snr = linear_to_dB_conversion_power(signal.signal_power / signal.noise_power) # if signal.latency is not None else 0
+                # snr = linear_to_dB_conversion_power(signal.signal_power / signal.noise_power) # if signal.latency is not None else 0
+                snr = linear_to_dB_conversion_power(1/signal.ISNR) # evaluates SNR by ISNR
 
                 latencies.append(signal.latency)
                 snrs.append(snr)
@@ -749,7 +750,7 @@ class Network: # this is the most important class and define the network from th
 
         bit_rate = bit_rate_evaluation(GSNR_lin, strategy)
         if hasattr(lightpath, 'channel'): # only lightpath has these attributes
-            lightpath.Rs = bit_rate
+            lightpath.Rs = Rs_symbol_rate
             lightpath.df = channel_spacing
         return bit_rate
 
