@@ -62,6 +62,14 @@ def SNR_metrics(connection_list):
     SNR_max = linear_to_dB_conversion_power( max( SNR_list ) )
     SNR_min = linear_to_dB_conversion_power( min( SNR_list ) )
     return [SNR_per_link_in_dB, SNR_max, SNR_min]
+def latency_metrics(connection_list):
+    latency_list = [ connection_list[i].latency for i in range(0, len(connection_list))]
+    total_latency = np.nansum( latency_list )
+    latency_average = total_latency / len(connection_list)
+
+    latency_max = max( latency_list )
+    latency_min = min( latency_list )
+    return [latency_average, latency_max, latency_min]
 def capacity_metrics(connections_list):
     [capacity, average_bit_rate] = capacity_and_average_bit_rate(connections_list=connections_list)
     bitrate_list = [connections_list[i].bit_rate for i in range(0, len(connections_list))]

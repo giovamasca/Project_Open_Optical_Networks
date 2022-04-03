@@ -90,7 +90,7 @@ def connection_list_data_extractor(connection_list, type_data):
         print('Error in type_data for connection list extractor!')
         exit(5)
     return list_data
-def print_and_save(text, file=None):
+def print_and_save(text, file=None): # used to print and save in file
     print(text)
     if file:
         file_print = open(file, 'a')
@@ -172,7 +172,7 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
     return
 ###########################################      LAB 10     ############################################################
 def lab10_point1_results(network, M, set_latency_or_snr, N_iterations, label, file_console=None):
-    from Project_Open_Optical_Networks.Core.science_utils import SNR_metrics, capacity_metrics
+    from Project_Open_Optical_Networks.Core.science_utils import SNR_metrics, latency_metrics, capacity_metrics
 
     results = {} # contains all results as a dictionary
 
@@ -194,10 +194,14 @@ def lab10_point1_results(network, M, set_latency_or_snr, N_iterations, label, fi
 
     ############## CAPACITY and BITRATE
     [SNR_ave_per_link, SNR_max, SNR_min] = SNR_metrics(connection_list=connections)
+    [latency_average, latency_max, latency_min] = latency_metrics(connection_list=connections)
     [capacity, average_bitrate, bitrate_max, bitrate_min] = capacity_metrics(connections_list=connections)
     results['SNR_ave_per_link'] = SNR_ave_per_link
     results['SNR_max'] = SNR_max
     results['SNR_min'] = SNR_min
+    results['latency_average'] = latency_average
+    results['latency_max'] = latency_max
+    results['latency_min'] = latency_min
     results['capacity'] = capacity
     results['average_bitrate'] = average_bitrate
     results['bitrate_max'] = bitrate_max
@@ -340,7 +344,7 @@ def lab10_point1_graphs(initial_fig, images_folder, results, set_latency_or_snr,
              loc='lower center',
              label=[label.replace('_', ' ') for label in results], title=title, savefig_path=savefig_path)
     #######################################################################################################################
-    ########################################            FIGURE     SNR MAX       #################################################
+    ########################################            FIGURE     SNR MIN       #################################################
     fig_num = fig_num + 1
     # preface_title = 'Lab 10 Point 1 - '
     savefig_path = images_folder / (
@@ -355,7 +359,7 @@ def lab10_point1_graphs(initial_fig, images_folder, results, set_latency_or_snr,
     final_fig = fig_num + 1
     return final_fig
 ########################################################################################################################
-def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_latency_or_snr, initial_fig ):
+def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_latency_or_snr, initial_fig , colors = None):
     #################################################### results
     ## number conncetions
     Number_connections_per_M_fixed = []
@@ -373,6 +377,18 @@ def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_
     SNRs_max_per_M_fixed = []
     SNRs_max_per_M_flex = []
     SNRs_max_per_M_shannon = []
+    ## Latency average
+    Latency_average_per_M_fixed = []
+    Latency_average_per_M_flex = []
+    Latency_average_per_M_shannon = []
+    ## Latency max
+    Latency_max_per_M_fixed = []
+    Latency_max_per_M_flex = []
+    Latency_max_per_M_shannon = []
+    ## Latency min
+    Latency_min_per_M_fixed = []
+    Latency_min_per_M_flex = []
+    Latency_min_per_M_shannon = []
     ## SNR min
     SNRs_min_per_M_fixed = []
     SNRs_min_per_M_flex = []
@@ -418,6 +434,19 @@ def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_
         SNRs_min_per_M_fixed.append(results_per_actual_M['Fixed_Rate']['SNR_min'])
         SNRs_min_per_M_flex.append(results_per_actual_M['Flex_Rate']['SNR_min'])
         SNRs_min_per_M_shannon.append(results_per_actual_M['Shannon_Rate']['SNR_min'])
+        ######## Latencies
+        ## Latency average
+        Latency_average_per_M_fixed.append(results_per_actual_M['Fixed_Rate']['latency_average'])
+        Latency_average_per_M_flex.append(results_per_actual_M['Flex_Rate']['latency_average'])
+        Latency_average_per_M_shannon.append(results_per_actual_M['Shannon_Rate']['latency_average'])
+        ## Latency max
+        Latency_max_per_M_fixed.append(results_per_actual_M['Fixed_Rate']['latency_max'])
+        Latency_max_per_M_flex.append(results_per_actual_M['Flex_Rate']['latency_max'])
+        Latency_max_per_M_shannon.append(results_per_actual_M['Shannon_Rate']['latency_max'])
+        ## Latency min
+        Latency_min_per_M_fixed.append(results_per_actual_M['Fixed_Rate']['latency_min'])
+        Latency_min_per_M_flex.append(results_per_actual_M['Flex_Rate']['latency_min'])
+        Latency_min_per_M_shannon.append(results_per_actual_M['Shannon_Rate']['latency_min'])
         ###### Bit Rates
         ## Capacity
         Capacity_per_M_fixed.append(results_per_actual_M['Fixed_Rate']['capacity'])
@@ -436,7 +465,6 @@ def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_
         Bit_Rate_min_per_M_flex.append(results_per_actual_M['Flex_Rate']['bitrate_min'])
         Bit_Rate_min_per_M_shannon.append(results_per_actual_M['Shannon_Rate']['bitrate_min'])
 
-    colors = ['r', 'y', 'b']
     fig_num = initial_fig
     preface_title = 'Lab 10 Point 2 - '
     savefig_path = images_folder / ('lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-',
@@ -487,12 +515,45 @@ def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_
              title=title, savefig_path=savefig_path)
     fig_num += 1
     preface_title = 'Lab 10 Point 2 - '
-    savefig_path = images_folder / (
-                'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_SNR_min_' + \
+    savefig_path = images_folder / ('lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_SNR_min_' + \
                 '_N_' + str(N_iterations) + '_and_find_best_' + set_latency_or_snr + '.png')
     title = preface_title + 'Minimum SNRs with N = ' + str(N_iterations) + ' and find best ' + set_latency_or_snr
     plot_bar(figure_num=fig_num, list_data=[SNRs_min_per_M_fixed, SNRs_min_per_M_flex, SNRs_min_per_M_shannon],
              x_ticks=M_list, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'], alpha=0.75, xlabel='M', ylabel='[dB]',
+             bottom=0.25, bbox_to_anchor=(0.5, -0.35), loc='lower center', color=colors,
+             title=title, savefig_path=savefig_path)
+    fig_num += 1
+    preface_title = 'Lab 10 Point 2 - '
+    savefig_path = images_folder / (
+            'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_average_latency_' + \
+            '_N_' + str(N_iterations) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Average latencies with N = ' + str(N_iterations) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num, list_data=[np.array(Latency_average_per_M_fixed)*1e3, np.array(Latency_average_per_M_flex)*1e3, np.array(Latency_average_per_M_shannon)*1e3],
+             x_ticks=M_list, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'], alpha=0.75, xlabel='M', ylabel='[ms]',
+             bottom=0.25, bbox_to_anchor=(0.5, -0.35), loc='lower center', color=colors,
+             title=title, savefig_path=savefig_path)
+    fig_num += 1
+    preface_title = 'Lab 10 Point 2 - '
+    savefig_path = images_folder / (
+            'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_latency_max_' + \
+            '_N_' + str(N_iterations) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Maximum latencies with N = ' + str(N_iterations) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num,
+             list_data=[np.array(Latency_max_per_M_fixed) * 1e3, np.array(Latency_max_per_M_flex) * 1e3,
+                        np.array(Latency_max_per_M_shannon) * 1e3],
+             x_ticks=M_list, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'], alpha=0.75, xlabel='M', ylabel='[ms]',
+             bottom=0.25, bbox_to_anchor=(0.5, -0.35), loc='lower center', color=colors,
+             title=title, savefig_path=savefig_path)
+    fig_num += 1
+    preface_title = 'Lab 10 Point 2 - '
+    savefig_path = images_folder / (
+            'lab10_fig' + str(fig_num) + '_' + preface_title.replace(' ', '_').replace('-', '') + '_latency_min_' + \
+            '_N_' + str(N_iterations) + '_and_find_best_' + set_latency_or_snr + '.png')
+    title = preface_title + 'Minimum latencies with N = ' + str(N_iterations) + ' and find best ' + set_latency_or_snr
+    plot_bar(figure_num=fig_num,
+             list_data=[np.array(Latency_min_per_M_fixed) * 1e3, np.array(Latency_min_per_M_flex) * 1e3,
+                        np.array(Latency_min_per_M_shannon) * 1e3],
+             x_ticks=M_list, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'], alpha=0.75, xlabel='M', ylabel='[ms]',
              bottom=0.25, bbox_to_anchor=(0.5, -0.35), loc='lower center', color=colors,
              title=title, savefig_path=savefig_path)
     fig_num += 1
