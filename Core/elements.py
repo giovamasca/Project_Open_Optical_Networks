@@ -12,7 +12,7 @@ class SignalInformation: # this is the class of the signal
         self._noise_power = float(0) # noise floor, will be defined by length of each line and power of signal
         self._latency = float(0) # latency in seconds
         self._path = path if path else 'ABD' # if a path is defined, else there is a standard definition
-        self._ISNR = float(0)
+        self._ISNR = float(0) # Inverse SNR, that is additive
     @property # property is to protect attributes
     def signal_power(self):
         return self._signal_power
@@ -43,7 +43,7 @@ class SignalInformation: # this is the class of the signal
     @ISNR.setter
     def ISNR(self, ISNR):
         self._ISNR=ISNR
-    def increment_ISNR(self, ISNR):
+    def increment_ISNR(self, ISNR): # each time a line is trapassed, evaluate SNR in inverse form and add it in class SignalInformation
         self.ISNR += ISNR
     def increment_noise(self, noise_to_update): # add noise along path
         self.noise_power += noise_to_update
@@ -89,9 +89,9 @@ class Lightpath( SignalInformation ): # inherited class from signal information
 class Node: # class for node definition
     def __init__(self, node_dictionary): # dictionary passed as input like {'label':'A', 'position':[x,y], 'connected_nodes':['B', 'D', 'C']}
         self._label = node_dictionary['label']
-        self._position = tuple(node_dictionary['position'])
+        self._position = tuple(node_dictionary['position']) # position[0] is x coordinate, position[1] is y coordinate
         self._connected_nodes = node_dictionary['connected_nodes']
-        self._successive = dict() # will be useful for connect method in network and propagate method
+        self._successive = dict() # will be useful for connect method in network and probe method
         self._switching_matrix = node_dictionary['switching_matrix'] # this is the switching matrix that will be modified
         self._transceiver = node_dictionary['transceiver'] if 'transceiver' in node_dictionary else 'fixed_rate'
     @property
@@ -143,7 +143,7 @@ class Line: # class for line objects
         self._label = label # this is the line label, for example 'AB'
         self._length = length # this is the length in meter for the line
         self._successive = {} # this will be useful for network connect method and propagate/probe functions
-        self._state = np.ones(number_of_active_channels, dtype='int') # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
+        self._state = np.ones(number_of_active_channels, dtype='int')*FREE # state defined by 0 or 1, 1 is free state and at the beginning they are put all free
         # state is a numpy array and are defined by integer numbers
         ### WE CANNOT STATE THEM "A PRIORI"
         ### ASE parameters and NODE parameters NF and G (standard values in parameters.py)
@@ -154,7 +154,7 @@ class Line: # class for line objects
         self._alpha_in_dB = loss_coefficient if loss_coefficient else alpha_in_dB_ct # standard 0.2 dB/km
         self._beta_abs_for_CD = propagation_constant if propagation_constant else beta_abs_for_CD_ct # standard 2.13e-26 # 1/(m*Hz^2)
         self._gamma_non_linearity = gamma_NL if gamma_NL else gamma_non_linearity_ct # 1.27e-3 # 1/(W*m)
-        self._L_effective = 1 / (2 * alpha_from_dB_to_linear_value(alpha_in_dB=self.alpha_in_dB)) # effective length
+        self._L_effective = 1 / (2 * alpha_from_dB_to_linear_value(alpha_in_dB=self.alpha_in_dB)) # effective length, it is the worst case value
         #### ETA NLI
         ### maximum number of channels because it is the worst case approach
         self._eta_NLI = eta_NLI_evaluation(alpha_dB=self.alpha_in_dB, beta=self.beta_abs_for_CD,
@@ -222,11 +222,12 @@ class Line: # class for line objects
         ASE = self.n_amplifier * (h_Plank * frequency_C_band * Bn_noise_band * dB_to_linear_conversion_power(self.noise_figure) * (dB_to_linear_conversion_power(self.gain) - 1))
         return ASE
     def nli_generation(self, power_of_the_channel):
-        NLI = np.power(power_of_the_channel, 3) * self.eta_NLI * self.n_amplifier * Bn_noise_band
+        NLI = np.power(power_of_the_channel, 3) * self.eta_NLI * (self.n_amplifier-1) * Bn_noise_band # avoid booster amplifier
         return NLI
     def optimized_launch_power(self):
         L_dB = self.alpha_in_dB * span_length # depends on each span the loss, then positive index as slide 13 set 9
-        ### L_dB is equivalent to gain!! transparency
+        # it belongs to span length and not last span, because it is defined NLI noise all together, not span by span
+        ### L_dB * span_length is equivalent to gain!! transparency
         # last span is not refined, has a larger margin
         argument = dB_to_linear_conversion_power(self.noise_figure) * np.power(10, L_dB/10) * h_Plank * frequency_C_band / ( 2 * self.eta_NLI )
         #by slide 49 set 8, P_optimum = np.power(P_ase/(2*eta_NLI), 1/3)
@@ -259,7 +260,7 @@ class Network: # this is the most important class and define the network from th
         self._route_space = pd.DataFrame(columns=['path', 'availability_per_ch'])
         self._file_name = json_file # to restore switching matrix
 
-        self.node_reading_from_file() # read file and creates nodes
+        self.node_reading_from_file() # read file and creates nodes, there is connect() at the end
         self.probe()
         self.route_space_update()
         ### TRAFFIC MATRIX
@@ -267,8 +268,8 @@ class Network: # this is the most important class and define the network from th
         ### doesn't work, same dict as argument fo first dict
         self._traffic_matrix = {}
         #initialization of traffic matrix with nodes dictionary of nodes dictionary, all components set to None
-        self.restart_traffic_matrix(M=M_for_traffic_matrix) # just for debug
-        self.connection_with_traffic_matrix()
+        self.restart_traffic_matrix(M=M_for_traffic_matrix) # initialization
+        # self.connection_with_traffic_matrix()
     @property
     def nodes(self):
         return self._nodes
@@ -317,7 +318,7 @@ class Network: # this is the most important class and define the network from th
                 # nodes['A'].successive['AB'] is lines['AB'] object
     def reset(self, M_traffic_matrix):
         self.node_reading_from_file()
-        # self.probe()
+        # self.probe() # remains the same weighted path
         self.restore_state_lines()
         # self.route_space_update()
         self.restart_traffic_matrix(M=M_traffic_matrix)
@@ -340,13 +341,13 @@ class Network: # this is the most important class and define the network from th
         # if self.traffic_matrix_saturated():
         #     return None # if there is no possible connection, return None
         nodes_gener = list(self.nodes.keys())  # extracts all nodes
-        [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels
+        [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # extract the two node labels randomly
         watchdog = 0 # put to avoid infinite loop
         while ( self.traffic_matrix[input_node][output_node]==0 or self.traffic_matrix[input_node][output_node]==np.inf):
             [input_node, output_node] = self.random_generation(nodes_gener=nodes_gener) # generate a pair of nodes available for traffic_matrix
             watchdog += 1
             if watchdog >= watchdog_limit: # when loop becomes too long, break out it. None is evaluated by origin to avoid computation still in loop.
-                # print('WATCHDOG break operation, no more traffic matrix available!')
+                # print('WATCHDOG break operation, no more traffic matrix managing!')
                 return None
         connection_generated = Connection(input_node=input_node, output_node=output_node, signal_power=1e-3)  # creates connection
         connection_generated = self.stream(connection=connection_generated, set_latency_or_snr=snr_or_latency, use_state=use_state)
@@ -425,7 +426,7 @@ class Network: # this is the most important class and define the network from th
                     availability_per_channel = self.lines[path[:2]].state
                     start = False
                 else:
-                    block = self.nodes[path[0]].switching_matrix[previous_node][path[1]]  # this is the switching matrix of the line
+                    block = self.nodes[path[0]].switching_matrix[previous_node][path[1]]  # this is the switching matrix of the line defined by previous and next node, and values related to actual node
                     line_state = self.lines[path[:2]].state # this is the array of line state
                     # each time we go through the line we update availabilities of channels by thre elements:
                     # 1 - updated availabilities for this path
@@ -508,7 +509,7 @@ class Network: # this is the most important class and define the network from th
                         switch_matrix_address=self.nodes[actual_node].switching_matrix[previous_node][next_node]
                         if signal.channel == 0: # if channel is the first one
                             switch_matrix_address[1] = OCCUPIED
-                        elif signal.channel == number_of_active_channels - 1: # if channel is the first one
+                        elif signal.channel == number_of_active_channels - 1: # if channel is the last one
                             switch_matrix_address[number_of_active_channels - 2] = OCCUPIED
                         else: # others position
                             switch_matrix_address[signal.channel - 1] = OCCUPIED
@@ -560,9 +561,9 @@ class Network: # this is the most important class and define the network from th
         plt.savefig('../Results/network_draw.png')
         #plt.show()
         # put outside
-    def area_network(self):
-        ### Shoelace formula
-        x = [self.nodes[key].position[0] for key in ['A', 'C', 'B', 'F', 'E']]
+    def area_network(self): # manually set
+        ### Shoelace formula - Gaussian Area Formula
+        x = [self.nodes[key].position[0] for key in ['A', 'C', 'B', 'F', 'E']] # put the vertex in order, one folowing the other
         y = [self.nodes[key].position[1] for key in ['A', 'C', 'B', 'F', 'E']]
         vertex_number = len(x)
         area = float(0)
@@ -594,9 +595,7 @@ class Network: # this is the most important class and define the network from th
                     title += node + '->' # this title requires an arrow to define direction
                 titles.append(title[:-2]) # removes last arrow
 
-                signal = SignalInformation(1e-3, path) # in point 5 of lab 3 is required 1 mW of signal power, by the way is not possible to view noise power
-                # let's define signal power as 1 W, the noise will be proportional to it
-                # SNR doesn't change
+                signal = SignalInformation(1e-3, path) # in point 5 of lab 3 is required 1 mW of signal power
 
                 ### Function for propagation
                 path = signal.path # extract path
@@ -605,7 +604,6 @@ class Network: # this is the most important class and define the network from th
                 #############################
 
                 # snr defined as dB, so 10 log10 of ratio between signal power and noise power
-                # if condition seems useless here, because there is no channel, is just a probe
                 # snr = linear_to_dB_conversion_power(signal.signal_power / signal.noise_power) # if signal.latency is not None else 0
                 snr = linear_to_dB_conversion_power(1/signal.ISNR) # evaluates SNR by ISNR
 
@@ -622,13 +620,6 @@ class Network: # this is the most important class and define the network from th
         # once done it shouldn't be repeated if the network is the same
         return
     def find_best(self, first_node, last_node):
-        # ############## TEST ################à
-        # self.lines['AB'].state= [OCCUPIED]*10 # verifies the case of all occupied state
-        # self.lines['DB'].state= [OCCUPIED]*10
-        # self.lines['FB'].state= [OCCUPIED]*10
-        # ####################################
-        # self.route_space_update()
-
         # define snr dataframe
         best_dataframe = pd.DataFrame(columns=['path', 'SNR', 'number_channels_available'])
 
@@ -639,23 +630,15 @@ class Network: # this is the most important class and define the network from th
         number_channels_available = []
         for path_label in self.weighted_paths['path']: # extract each path obtained in weighted paths
             if path_label[0] == first_node and path_label[-1] == last_node: # we are interested in only some specific paths with input and output defined
-                path = path_label.replace('->','') # remove arrows
                 free = True # needed to remember out the while cycle that there is at least a free status or not
-                line = path[0:2] # extract line name
 
-                states_path = np.ones(number_of_active_channels, dtype='int') # this array updates states along path, array of integers
-                while len(line)>1: # if there is enough nodes to define a path, at least two nodes
+                # extract the states from route space for this path
+                states = self.route_space['availability_per_ch'].loc[self.route_space['path']==path_label].item() # extracted as array
+                if np.sum(states) == OCCUPIED: # at least required one free state, so let's find where all accupancies are (all zeros, zero sum)
+                    free = False # let's remember that everything is occupied
 
-                    # extract the states from route space for this path
-                    states = self.route_space['availability_per_ch'].loc[self.route_space['path']==path_label].item() # extracted as array
-                    states_path = states_path * states # save states and update them while they are going line by line
-                    if np.sum(states) == OCCUPIED: # at least required one free state, so let's find where all accupancies are (all zeros, zero sum)
-                        free = False # let's remember that everything is occupied
-                        break # useless go along the line, let's break out the while
-                    path = path[1:] # update path for while (remove first node and go on)
-                    line = path[0:2] # update line
                 if free==True: # only to do if at least there is one free state
-                    channels = np.array([i for i in range(0, number_of_active_channels) if states_path[i] == FREE]) # extracts positions [numbers that could be from 0 to max ch]
+                    channels = np.array([i for i in range(0, number_of_active_channels) if states[i] == FREE]) # extracts positions [numbers that could be from 0 to max ch]
                     if len(channels)>0: # if there are available channels it appends in list the results for dataframe
                         paths.append(path_label)
                         snrs.append(self.weighted_paths['SNR'].loc[self.weighted_paths['path']==path_label].item()) # needed snr fot the corresponding path
@@ -758,10 +741,10 @@ class Network: # this is the most important class and define the network from th
 
         if hasattr(lightpath, 'channel'): # only lightpath has these attributes
             Rs = lightpath.Rs
-            DeltaF = lightpath.df
+            # DeltaF = lightpath.df
         else:
             Rs = Rs_symbol_rate
-            DeltaF = channel_spacing
+            # DeltaF = channel_spacing
 
         # let's find the corresponding SNR for path label at input and obtain it as a floating number
         GSNR_dB = self.weighted_paths['SNR'].loc[self.weighted_paths['path'] == path_label].item()
