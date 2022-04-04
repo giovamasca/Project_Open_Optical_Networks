@@ -11,7 +11,7 @@ file_console = root / 'Results' / 'Lab10' / trial_path / 'console.txt'
 images_folder = root / 'Results' / 'Lab10' / trial_path / 'Images'
 
 ################             N  simulations            ####################
-N_iterations = Number_simulations
+N_iterations = 250
 ###########################################################################
 file_print = open(file_console, 'w')
 file_print.close()
@@ -56,7 +56,7 @@ is_saturated_per_M_fixed = []
 is_saturated_per_M_flex = []
 is_saturated_per_M_shannon = []
 
-M_list = [ 1, 5, 15, 35, 45, 55]
+M_list = range(1, 10, 2)# [15, 35, 45, 55]
 for M in M_list:
     print_and_save(text='\nM=' + str(M) + ':', file=file_console)
     results_per_M[str(M)] = {}#{'Fixed_Rate':{}, 'Flex_Rate':{}, 'Shannon_Rate':{}}

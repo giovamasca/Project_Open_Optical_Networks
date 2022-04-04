@@ -51,13 +51,15 @@ def bit_rate_evaluation(GSNR_lin, strategy, Rs):
 
 def capacity_and_average_bit_rate(connections_list):
     capacity = np.nansum( [connections_list[i].bit_rate for i in range(0, len(connections_list))] )
-    avarage_bit_rate = capacity / len(connections_list)
+    blocking_events = sum(connection.channel is None for connection in connections_list)
+    avarage_bit_rate = capacity / ( len(connections_list) - blocking_events )
     return [capacity, avarage_bit_rate]
 def SNR_metrics(connection_list):
     ### averaging on linear quantities
     SNR_list = [dB_to_linear_conversion_power( connection_list[i].snr ) for i in range(0, len(connection_list))]
     total_SNR_linear = np.nansum( SNR_list )
-    SNR_per_link_in_dB = linear_to_dB_conversion_power( total_SNR_linear / len(connection_list) )
+    blocking_events = sum(connection.channel is None for connection in connection_list)
+    SNR_per_link_in_dB = linear_to_dB_conversion_power( total_SNR_linear / (len(connection_list)-blocking_events) )
 
     SNR_max = linear_to_dB_conversion_power( max( SNR_list ) )
     SNR_min = linear_to_dB_conversion_power( min( SNR_list ) )
@@ -65,7 +67,8 @@ def SNR_metrics(connection_list):
 def latency_metrics(connection_list):
     latency_list = [ connection_list[i].latency for i in range(0, len(connection_list))]
     total_latency = np.nansum( latency_list )
-    latency_average = total_latency / len(connection_list)
+    blocking_events = sum(connection.channel is None for connection in connection_list)
+    latency_average = total_latency / ( len(connection_list) - blocking_events )
 
     latency_max = max( latency_list )
     latency_min = min( latency_list )
