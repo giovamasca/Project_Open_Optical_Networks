@@ -122,7 +122,7 @@ def plot_histogram(figure_num=None, list_data=None, nbins=None, edge_color='k', 
     # fig.canvas.draw()
     # plt.pause(0.25)
     return
-def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', color=None, label=None, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None):
+def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', color=None, label=None, title='', ylabel = '', xlabel = '', savefig_path = None, bbox_to_anchor = None, loc = None, bottom = None, NaN_display=False, alpha=None, remove_y_ticks=None):
     if NaN_display:
         list_data = list(np.nan_to_num(list_data)) # replace NaN with 0
 
@@ -159,6 +159,10 @@ def plot_bar(figure_num=None, list_data=None, x_ticks=None, edge_color='k', colo
             bottom=False,  # ticks along the bottom edge are off
             top=False,  # ticks along the top edge are off
             labelbottom=False)
+    if remove_y_ticks:
+        plt.tick_params(axis='y',  # changes apply to the x-axis
+                        which='both',  # both major and minor ticks are affected
+                        left = False, right = False , labelleft = False)
     ax.legend(labels=label, bbox_to_anchor = bbox_to_anchor, loc = loc)
 
     figure = plt.gcf()  # get current figure
@@ -604,3 +608,4 @@ def lab10_point2_graphs(results_per_M, M_list, images_folder, N_iterations, set_
              bottom=0.25, bbox_to_anchor=(0.5, -0.35), loc='lower center', color=colors,
              title=title, savefig_path=savefig_path)
     fig_num += 1
+    return fig_num

@@ -32,6 +32,7 @@ lab9_fig13 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig13_po
 lab9_fig14 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig14_point7_number_of_blocking_events_best_' + set_latency_or_snr)
 lab9_fig15 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig15_point7_capacities_best_' + set_latency_or_snr)
 lab9_fig16 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig16_point7_average_bitrate_best_' + set_latency_or_snr)
+lab9_fig17 = root / 'Results' / 'Lab9' / trial_path / 'Images' / ('lab9_fig17_point7_traffic_matrix_saturation_best_' + set_latency_or_snr)
 
 ############ NETWORKs GENERATION
 # these 3 networks has defined transceiver instance
@@ -99,23 +100,26 @@ print('\n\t\t\tPoint 7 Lab 9\n', file=file_print)
 connections_fixed_per_M = []
 number_connections_fixed_rate_per_M = []
 number_blocking_events_fixed_rate_per_M = []
+is_saturated_fixed_rate_per_M = []
 capacities_fixed_rate_per_M = []
 average_bitrate_fixed_rate_per_M = []
 
 connections_flex_per_M = []
 number_connections_flex_rate_per_M = []
 number_blocking_events_flex_rate_per_M = []
+is_saturated_flex_rate_per_M = []
 capacities_flex_rate_per_M = []
 average_bitrate_flex_rate_per_M = []
 
 connections_shannon_per_M = []
 number_connections_shannon_per_M = []
 number_blocking_events_shannon_per_M = []
+is_saturated_shannon_per_M = []
 capacities_shannon_per_M = []
 average_bitrate_shannon_per_M = []
 
 M_list = []
-for M in range(1, 34, 4): # [1, 10, 25, 45, 60] # range(1, 47, 9)
+for M in range(0, 6): # [1, 10, 25, 45, 60] # range(1, 47, 9)
     M_list.append(M)
 
     ################### FIXED RATE #####################
@@ -133,6 +137,8 @@ for M in range(1, 34, 4): # [1, 10, 25, 45, 60] # range(1, 47, 9)
     connections_fixed_per_M.append(connections_fixed_rate)
     number_connections_fixed_rate_per_M.append(number_connections_fixed_rate)
     number_blocking_events_fixed_rate_per_M.append(number_blocking_events_fixed_rate)
+
+    is_saturated_fixed_rate_per_M.append( 1 if network_fixed_rate.traffic_matrix_saturated() else 0 )
     ############## CAPACITY and BITRATE
     [capacity_fixed_rate, average_bit_rate_fixed_rate] = capacity_and_avarage(connections_list=connections_fixed_rate)
     capacities_fixed_rate_per_M.append(capacity_fixed_rate)
@@ -156,6 +162,8 @@ for M in range(1, 34, 4): # [1, 10, 25, 45, 60] # range(1, 47, 9)
     connections_flex_per_M.append(connections_flex_rate)
     number_connections_flex_rate_per_M.append(number_connections_flex_rate)
     number_blocking_events_flex_rate_per_M.append(number_blocking_events_flex_rate)
+
+    is_saturated_flex_rate_per_M.append(1 if network_flex_rate.traffic_matrix_saturated() else 0)
     ############## CAPACITY and BITRATE
     [capacity_flex_rate, average_bit_rate_flex_rate] = capacity_and_avarage(connections_list=connections_flex_rate)
     capacities_flex_rate_per_M.append(capacity_flex_rate)
@@ -179,6 +187,8 @@ for M in range(1, 34, 4): # [1, 10, 25, 45, 60] # range(1, 47, 9)
     connections_shannon_per_M.append(connections_shannon)
     number_connections_shannon_per_M.append(number_connections_shannon)
     number_blocking_events_shannon_per_M.append(number_blocking_events_shannon)
+
+    is_saturated_shannon_per_M.append(1 if network_shannon.traffic_matrix_saturated() else 0)
     ############## CAPACITY and BITRATE
     [capacity_shannon, average_bit_rate_shannon] = capacity_and_avarage(connections_list=connections_shannon)
     capacities_shannon_per_M.append(capacity_shannon)
@@ -267,7 +277,19 @@ plot_bar(figure_num=(16), list_data=[[average_bitrate_fixed_rate_per_M[i] for i 
          xlabel='M value for traffic matrix', ylabel='Average Bit Rate [Gbps]',
          title=('Point 7 Lab 9 - Average Bit Rate - with best '+set_latency_or_snr), alpha=0.75,
          savefig_path=lab9_fig16)
-
+##################### Traffic Matrix Saturation
+# plot_histogram(figure_num=(17), list_data=[is_saturated_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+#                nbins=None, edge_color='k', color=None, label=['M='+str(M_list[i]) for i in range(0, len(M_list))],
+#                xlabel=' ', ylabel=' ', title=('Point 7 Lab 9 - Traffic Matrix saturation Fixed Rate - with best '+set_latency_or_snr), alpha=0.75,
+#                savefig_path=None)
+plot_bar(figure_num=(17), list_data=[[is_saturated_fixed_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [is_saturated_flex_rate_per_M[i] for i in range(0, len(M_list))],
+                                           [is_saturated_shannon_per_M[i] for i in range(0, len(M_list))]],
+         x_ticks = [M for M in M_list], bbox_to_anchor=(0.5, -0.35), bottom=0.25, loc='lower center',
+         edge_color='k', color=None, label=['Fixed Rate', 'Flex Rate', 'Shannon Rate'],
+         xlabel='M value for traffic matrix', ylabel='Saturated Traffic Matricies', remove_y_ticks=True,
+         title=('Point 7 Lab 9 - Traffic Matrix Saturation - with best '+set_latency_or_snr), alpha=0.75,
+         savefig_path=lab9_fig17)
 plt.figure(18)
 network_fixed_rate.draw()
 
