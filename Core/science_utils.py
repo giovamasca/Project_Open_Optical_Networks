@@ -52,7 +52,7 @@ def bit_rate_evaluation(GSNR_lin, strategy, Rs):
 def capacity_and_average_bit_rate(connections_list):
     capacity = np.nansum( [connections_list[i].bit_rate for i in range(0, len(connections_list))] )
     blocking_events = sum(connection.channel is None for connection in connections_list)
-    avarage_bit_rate = capacity / ( len(connections_list) - blocking_events )
+    avarage_bit_rate = capacity / ( len(connections_list) ) #- blocking_events )
     return [capacity, avarage_bit_rate]
 def SNR_metrics(connection_list):
     ### averaging on linear quantities

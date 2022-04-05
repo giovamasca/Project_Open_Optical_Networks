@@ -56,7 +56,7 @@ is_saturated_per_M_fixed = []
 is_saturated_per_M_flex = []
 is_saturated_per_M_shannon = []
 
-M_list = range(1, 10, 2)# [15, 35, 45, 55]
+M_list = [15, 35, 45, 55]# range(1, 10, 2) # [15, 35, 45, 55]
 for M in M_list:
     print_and_save(text='\nM=' + str(M) + ':', file=file_console)
     results_per_M[str(M)] = {}#{'Fixed_Rate':{}, 'Flex_Rate':{}, 'Shannon_Rate':{}}
